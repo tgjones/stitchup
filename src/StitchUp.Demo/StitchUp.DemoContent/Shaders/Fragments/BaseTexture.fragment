@@ -1,0 +1,15 @@
+﻿interface()
+{
+	$name = base_texture
+	$textures = color_map
+	$vertex = uv
+	$interpolators = uv
+	$uv = 2
+}
+
+ps 1_1
+
+void main(INPUT input, inout OUTPUT output)
+{
+	output.color = tex2D(color_map, input.uv);
+}
