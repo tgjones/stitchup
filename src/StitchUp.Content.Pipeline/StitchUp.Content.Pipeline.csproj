@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Graphics\StitchedEffectContent.cs" />
+    <Compile Include="Processors\StitchedEffectModelProcessor.cs" />
     <Compile Include="Processors\StitchedEffectProcessor.cs" />
     <Compile Include="StitchedEffectImporter.cs" />
     <Compile Include="FragmentLinking\CodeGeneration\EffectCodeGenerator.cs" />

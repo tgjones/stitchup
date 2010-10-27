@@ -121,7 +121,14 @@ namespace ChaseCameraSample
             spriteFont = Content.Load<SpriteFont>("gameFont");
 
             shipModel = Content.Load<Model>("Ship");
+						foreach (ModelMesh mesh in shipModel.Meshes)
+							foreach (ModelMeshPart meshPart in mesh.MeshParts)
+								meshPart.Effect.Parameters["base_texture1_color_map"].SetValue(Content.Load<Texture>("ShipDiffuse"));
+
             groundModel = Content.Load<Model>("Ground");
+						foreach (ModelMesh mesh in groundModel.Meshes)
+							foreach (ModelMeshPart meshPart in mesh.MeshParts)
+								meshPart.Effect.Parameters["base_texture1_color_map"].SetValue(Content.Load<Texture>("Checker"));
         }
 
 
@@ -240,14 +247,13 @@ namespace ChaseCameraSample
 
             foreach (ModelMesh mesh in model.Meshes)
             {
-                foreach (BasicEffect effect in mesh.Effects)
+                foreach (EffectMaterial effect in mesh.Effects)
                 {
-                    effect.EnableDefaultLighting();
-                    effect.World = transforms[mesh.ParentBone.Index] * world;
+									// Use the matrices provided by the chase camera
+									Matrix wvp = transforms[mesh.ParentBone.Index] * world * camera.View * camera.Projection;
+                	effect.Parameters.GetParameterBySemantic("WORLDVIEWPROJECTION").SetValue(wvp);
 
-                    // Use the matrices provided by the chase camera
-                    effect.View = camera.View;
-                    effect.Projection = camera.Projection;
+                	//effect.EnableDefaultLighting();
                 }
                 mesh.Draw();
             }

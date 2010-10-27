@@ -136,7 +136,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 				fragment.InterfaceInterpolators.ToList().ForEach(i =>
 					mangledCode = Regex.Replace(mangledCode, @"([^\w\.])(" + i + @")(\W)", "$1" + mangledFragmentName + "_$2$3"));
 				fragment.InterfaceTextures.ForEach(t =>
-					mangledCode = Regex.Replace(mangledCode, @"(\W)(" + t + @")(\W)", "$1" + mangledFragmentName + "_$2$3"));
+					mangledCode = Regex.Replace(mangledCode, @"(\W)(" + t + @")(\W)", "$1" + mangledFragmentName + "_$2_sampler$3"));
 
 				mangledCode = mangledCode.Replace("void main(", string.Format("void {0}_ps(", mangledFragmentName));
 				mangledCode = mangledCode.Replace("INPUT", string.Format("{0}_PIXELINPUT", mangledFragmentName));
@@ -174,8 +174,9 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			fragment.InterfaceParams.ForEach(p =>
 			{
 				FragmentParameterContent parameter = fragment.InterfaceParameterMetadata[p];
-				_output.AppendLineFormat("{0} {1}_{2};", FragmentParameterDataTypeUtility.ToString(parameter.DataType),
-					mangledFragmentName, p);
+				string semantic = (!string.IsNullOrEmpty(parameter.Semantic)) ? " : " + parameter.Semantic : string.Empty;
+				_output.AppendLineFormat("{0} {1}_{2}{3};", FragmentParameterDataTypeUtility.ToString(parameter.DataType),
+					mangledFragmentName, p, semantic);
 			});
 			_output.AppendLine();
 		}
@@ -192,7 +193,11 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 
 			_output.AppendLineFormat("// {0} textures", mangledFragmentName);
 			fragment.InterfaceTextures.ForEach(t =>
-				_output.AppendLineFormat("sampler {0};", GetSamplerName(mangledFragmentName, t)));
+			{
+				_output.AppendLineFormat("texture2D {0};", GetSamplerName(mangledFragmentName, t));
+				_output.AppendLineFormat("sampler {0}_sampler = sampler_state {{ Texture = ({0}); }};",
+					GetSamplerName(mangledFragmentName, t));
+			});
 			_output.AppendLine();
 		}
 

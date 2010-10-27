@@ -62,12 +62,14 @@
     <Compile Include="Ground.x">
       <Name>Ground</Name>
       <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>StitchedEffectModelProcessor</Processor>
+      <ProcessorParameters_StitchedEffect>Shaders\BasicEffect.effect</ProcessorParameters_StitchedEffect>
     </Compile>
     <Compile Include="Ship.fbx">
       <Name>Ship</Name>
       <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>StitchedEffectModelProcessor</Processor>
+      <ProcessorParameters_StitchedEffect>Shaders\BasicEffect.effect</ProcessorParameters_StitchedEffect>
     </Compile>
   </ItemGroup>
   <ItemGroup>

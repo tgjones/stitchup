@@ -1,7 +1,9 @@
 ﻿interface()
 {
 	$name = base_texture
+
 	$textures = color_map
+
 	$vertex = uv
 	$interpolators = uv
 	$uv = 2
