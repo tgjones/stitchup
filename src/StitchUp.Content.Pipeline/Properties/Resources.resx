@@ -126,6 +126,9 @@
   <data name="ParserDataTypeExpected" xml:space="preserve">
     <value>Data type (bool, float, float2, float3, float4, matrix, texture2D) expected.</value>
   </data>
+  <data name="ParserParameterBlockTypeExpected" xml:space="preserve">
+    <value>Block type (parameters, interpolators, vertexattributes, textures, vs, ps) expected, but found '{0}'.</value>
+  </data>
   <data name="ParserTokenExpected" xml:space="preserve">
     <value>Syntax error: '{0}' expected.</value>
   </data>

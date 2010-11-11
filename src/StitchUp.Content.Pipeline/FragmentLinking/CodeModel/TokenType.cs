@@ -65,6 +65,9 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		Error,
 
 		[Description(";")]
-		Semicolon
+		Semicolon,
+
+		[Description("Shader Code")]
+		ShaderCode
 	}
 }

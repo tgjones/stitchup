@@ -5,7 +5,7 @@ using StitchUp.Content.Pipeline.Graphics;
 
 namespace StitchUp.Content.Pipeline
 {
-	[ContentImporter(".effect", DisplayName = "Stitched Effect - StitchUp", DefaultProcessor = "StitchedEffectProcessor")]
+	[ContentImporter(".stitchedeffect", DisplayName = "Stitched Effect - StitchUp", DefaultProcessor = "StitchedEffectProcessor")]
 	public class StitchedEffectImporter : ContentImporter<StitchedEffectContent>
 	{
 		public override StitchedEffectContent Import(string filename, ContentImporterContext context)

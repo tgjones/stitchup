@@ -1,287 +1,304 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using StitchUp.Content.Pipeline.Graphics;
+using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
+using StitchUp.Content.Pipeline.Properties;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 {
 	public class FragmentParser
 	{
-		private readonly LineReader _fragmentReader;
-		private int _lineNumber;
+		public event ErrorEventHandler Error;
 
-		public FragmentContent Fragment
+		private readonly string _path;
+		private readonly Token[] _tokens;
+		private int _tokenIndex;
+		private BufferPosition _lastErrorPosition;
+
+		public FragmentParser(string path, Token[] tokens)
 		{
-			get;
-			private set;
+			_path = path;
+			_tokens = tokens;
 		}
 
-		public FragmentParser(string fragment)
+		public FragmentNode Parse()
 		{
-			_fragmentReader = new LineReader(fragment);
-			Fragment = new FragmentContent();
+			_tokenIndex = 0;
+
+			FragmentNode fragmentNode = ParseFragmentDeclaration();
+			return fragmentNode;
 		}
 
-		public void Parse()
+		private FragmentNode ParseFragmentDeclaration()
 		{
-			ParseInterfaceBlock();
-			SkipWhiteSpace();
-			if (_fragmentReader.Peek() == -1)
-				return;
+			Eat(TokenType.Fragment);
 
-			while (_fragmentReader.Peek() != -1)
-				ParseShader();
-		}
+			IdentifierToken fragmentName = (IdentifierToken) Eat(TokenType.Identifier);
+			Eat(TokenType.Semicolon);
 
-		#region Interface block
+			List<ParseNode> blocks = ParseBlocks();
 
-		private void ParseInterfaceBlock()
-		{
-			SkipWhiteSpace();
-			ReadKnownText("interface()");
-			SkipWhiteSpace();
-			ReadKnownText("{");
-			while (_fragmentReader.Peek() != '}')
-				ParseInterfaceAssignment();
-			SkipWhiteSpace();
-			ReadKnownText("}");
-		}
-
-		private void ParseInterfaceAssignment()
-		{
-			SkipWhiteSpace();
-
-			string name = ReadVariableName();
-
-			SkipWhiteSpace();
-			ReadKnownText("=");
-			SkipWhiteSpace();
-
-			string value = ReadToEndOfLine();
-
-			switch (name)
+			return new FragmentNode
 			{
-				case "name":
-					Fragment.InterfaceName = value;
-					break;
-				case "params":
-					Fragment.InterfaceParams.AddRange(ParseInterfaceValues(value));
-					break;
-				case "textures" :
-					Fragment.InterfaceTextures.AddRange(ParseInterfaceValues(value));
-					break;
-				case "vertex":
-					Fragment.InterfaceVertex.AddRange(ParseInterfaceValues(value));
-					break;
-				case "interpolators":
-					Fragment.InterfaceInterpolators.AddRange(ParseInterfaceValues(value));
-					break;
-				default :
-					// If value contains square brackets, then we have multiple values.
-					FragmentParameterContent parameterContent = ParseInterfaceParameterMetadata(value);
-					Fragment.InterfaceParameterMetadata.Add(name, parameterContent);
-					break;
-			}
-
-			SkipWhiteSpace();
+				Name = fragmentName.Identifier,
+				Interpolators = blocks.OfType<ParameterBlockNode>().FirstOrDefault(b => b.Type == ParameterBlockType.Interpolators),
+				Parameters = blocks.OfType<ParameterBlockNode>().FirstOrDefault(b => b.Type == ParameterBlockType.Parameters),
+				VertexAttributes =
+					blocks.OfType<ParameterBlockNode>().FirstOrDefault(b => b.Type == ParameterBlockType.VertexAttributes),
+				Textures = blocks.OfType<ParameterBlockNode>().FirstOrDefault(b => b.Type == ParameterBlockType.Textures),
+				HeaderCode = blocks.OfType<HeaderCodeBlockNode>().FirstOrDefault(),
+				VertexShaders =
+					new ShaderCodeBlockNodeCollection(blocks.OfType<ShaderCodeBlockNode>().Where(c => c.ShaderType == ShaderType.VertexShader)),
+				PixelShaders =
+					new ShaderCodeBlockNodeCollection(blocks.OfType<ShaderCodeBlockNode>().Where(c => c.ShaderType == ShaderType.PixelShader))
+			};
 		}
 
-		private static IEnumerable<string> ParseInterfaceValues(string value)
+		private List<ParseNode> ParseBlocks()
 		{
-			List<string> result = new List<string>();
+			List<ParseNode> result = new List<ParseNode>();
 
-			StringReader metadataReader = new StringReader(value);
-			SkipWhiteSpace(metadataReader);
-			if (metadataReader.Peek() == '[')
-			{
-				ReadKnownText(metadataReader, "[", -1);
-				SkipWhiteSpace(metadataReader);
-				while (metadataReader.Peek() != ']')
-				{
-					if (metadataReader.Peek() == ',')
-						ReadKnownText(metadataReader, ",", -1);
-					SkipWhiteSpace(metadataReader);
-					string name = ReadUntil(metadataReader, ',', ' ', ']');
-					result.Add(name);
-					SkipWhiteSpace(metadataReader);
-				}
-			}
-			else
-			{
-				result.Add(ReadContiguousText(metadataReader));
-			}
+			while (PeekType() == TokenType.OpenSquare)
+				result.Add(ParseBlock());
+
 			return result;
 		}
 
-		private FragmentParameterContent ParseInterfaceParameterMetadata(string value)
+		private ParseNode ParseBlock()
 		{
-			FragmentParameterContent content = new FragmentParameterContent();
-			StringReader metadataReader = new StringReader(value);
-			SkipWhiteSpace(metadataReader);
-			if (metadataReader.Peek() == '[')
-			{
-				ReadKnownText(metadataReader, "[", -1);
-				SkipWhiteSpace(metadataReader);
-				content.DataType = FragmentParameterDataTypeUtility.FromString(ReadUntil(metadataReader, ',', ' ', ']'));
-				SkipWhiteSpace(metadataReader);
-				while (metadataReader.Peek() != ']')
-				{
-					ReadKnownText(metadataReader, ",", -1);
-					SkipWhiteSpace(metadataReader);
-					string metadataName = ReadUntil(metadataReader, '=');
-					ReadKnownText(metadataReader, "=", -1);
-					string metadataValue = ReadUntil(metadataReader, ',', ' ', ']').Trim('"');
-					switch (metadataName)
-					{
-						case "semantic" :
-							content.Semantic = metadataValue;
-							break;
-						default :
-							throw new NotSupportedException();
-					}
-					SkipWhiteSpace(metadataReader);
-				}
-			}
-			else
-			{
-				content.DataType = FragmentParameterDataTypeUtility.FromString(ReadContiguousText(metadataReader));
-			}
-			return content;
-		}
+			Eat(TokenType.OpenSquare);
 
-		private string ReadVariableName()
-		{
-			ReadKnownText("$");
-			return ReadContiguousText();
-		}
-
-		#endregion
-
-		#region Shader
-
-		private void ParseShader()
-		{
-			SkipWhiteSpace();
-
-			FragmentCodeShaderType shaderType;
-			string rawShaderType = ReadContiguousText();
-			switch (rawShaderType)
+			IdentifierToken blockName = (IdentifierToken) Eat(TokenType.Identifier);
+			switch (blockName.Identifier)
 			{
 				case "vs":
-					shaderType = FragmentCodeShaderType.VertexShader;
-					break;
 				case "ps":
-					shaderType = FragmentCodeShaderType.PixelShader;
-					break;
+					return ParseShaderCodeBlock(blockName);
+				case "headercode" :
+					return ParseHeaderCodeBlock();
 				default:
-					throw new ParserException("Expected 'vs' or 'ps' but found '" + rawShaderType + "'", _lineNumber);
+					return ParseParameterBlock(blockName);
 			}
+		}
 
-			SkipWhiteSpace();
+		private CodeBlockNodeBase ParseHeaderCodeBlock()
+		{
+			Eat(TokenType.CloseSquare);
 
-			string version = ReadContiguousText();
+			ShaderCodeToken shaderCode = (ShaderCodeToken)Eat(TokenType.ShaderCode);
 
-			SkipWhiteSpace();
+			return new HeaderCodeBlockNode
+			{
+				Code = shaderCode.ShaderCode
+			};
+		}
 
-			string code = ReadLinesUntil("vs", "ps").Trim();
+		private CodeBlockNodeBase ParseShaderCodeBlock(IdentifierToken blockName)
+		{
+			ShaderType shaderType = GetShaderType(blockName);
 
-			FragmentCodeContent codeContent = new FragmentCodeContent
+			IdentifierToken version = (IdentifierToken) Eat(TokenType.Identifier);
+			ShaderModel shaderModel = GetShaderModel(version);
+
+			Eat(TokenType.CloseSquare);
+
+			ShaderCodeToken shaderCode = (ShaderCodeToken) Eat(TokenType.ShaderCode);
+
+			return new ShaderCodeBlockNode
 			{
 				ShaderType = shaderType,
-				Version = version,
-				Code = code
+				ShaderModel = shaderModel,
+				Code = shaderCode.ShaderCode
 			};
-
-			Fragment.CodeBlocks.Add(codeContent);
 		}
 
-		#endregion
-
-		private static string ReadUntil(StringReader reader, params char[] marker)
+		private static ShaderType GetShaderType(IdentifierToken blockName)
 		{
-			string result = string.Empty;
-			while (true)
+			switch (blockName.Identifier)
 			{
-				int nextChar = reader.Peek();
-				if (nextChar == -1)
-					return result;
-
-				if (marker.Any(m => m == (char)nextChar))
-					return result;
-
-				reader.Read();
-				result += (char) nextChar;
+				case "vs":
+					return ShaderType.VertexShader;
+				case "ps" :
+					return ShaderType.PixelShader;
+				default :
+					throw new NotSupportedException();
 			}
 		}
 
-		private string ReadLinesUntil(params string[] markers)
+		private static ShaderModel GetShaderModel(IdentifierToken model)
 		{
-			string result = string.Empty;
-			while (true)
+			switch (model.Identifier)
 			{
-				++_lineNumber;
-				string line = _fragmentReader.PeekLine();
-				if (line == null || markers.Any(m => line.StartsWith(m)))
-					return result;
-
-				_fragmentReader.ReadLine();
-				result += line + Environment.NewLine;
+				case "1_0":
+					return ShaderModel.Version1_0;
+				case "1_1":
+					return ShaderModel.Version1_1;
+				case "2_0":
+					return ShaderModel.Version2_0;
+				case "3_0":
+					return ShaderModel.Version3_0;
+				default:
+					throw new NotSupportedException();
 			}
 		}
 
-		private static string ReadContiguousText(StringReader reader)
+		private ParameterBlockNode ParseParameterBlock(IdentifierToken blockName)
 		{
-			string result = string.Empty;
-			while (true)
+			Eat(TokenType.CloseSquare);
+
+			ParameterBlockType blockType = GetParameterBlockType(blockName);
+
+			List<VariableDeclarationNode> variableDeclarations = ParseVariableDeclarations();
+			return new ParameterBlockNode
 			{
-				int nextChar = reader.Peek();
-				if (nextChar == -1)
-					break;
+				Type = blockType,
+				VariableDeclarations = variableDeclarations
+			};
+		}
 
-				if (char.IsWhiteSpace((char)nextChar))
-					break;
-
-				reader.Read();
-				result += (char) nextChar;
+		private ParameterBlockType GetParameterBlockType(IdentifierToken blockName)
+		{
+			switch (blockName.Identifier)
+			{
+				case "interpolators":
+					return ParameterBlockType.Interpolators;
+				case "parameters":
+				case "params":
+					return ParameterBlockType.Parameters;
+				case "textures":
+					return ParameterBlockType.Textures;
+				case "vertexattributes":
+				case "vertex":
+					return ParameterBlockType.VertexAttributes;
+				case "header":
+					return ParameterBlockType.Header;
+				default:
+					ReportError(Resources.ParserParameterBlockTypeExpected, blockName.Identifier);
+					throw new NotSupportedException();
 			}
+		}
+
+		private List<VariableDeclarationNode> ParseVariableDeclarations()
+		{
+			List<VariableDeclarationNode> result = new List<VariableDeclarationNode>();
+
+			while (PeekType() != TokenType.OpenSquare && PeekType() != TokenType.Eof)
+				result.Add(ParseVariableDeclaration());
+
 			return result;
 		}
 
-		private string ReadToEndOfLine()
+		private VariableDeclarationNode ParseVariableDeclaration()
 		{
-			++_lineNumber;
-			return _fragmentReader.ReadLine();
+			Token dataType = EatDataType();
+			IdentifierToken variableName = (IdentifierToken) Eat(TokenType.Identifier);
+
+			string semantic = null;
+			if (PeekType() == TokenType.Colon)
+			{
+				Eat(TokenType.Colon);
+				semantic = ((IdentifierToken) Eat(TokenType.Identifier)).Identifier;
+			}
+
+			Eat(TokenType.Semicolon);
+
+			return new VariableDeclarationNode
+			{
+				Name = variableName.Identifier,
+				DataType = GetDataType(dataType.Type),
+				Semantic = semantic
+			};
 		}
 
-		private string ReadContiguousText()
+		private static DataType GetDataType(TokenType type)
 		{
-			return ReadContiguousText(_fragmentReader);
+			switch (type)
+			{
+				case TokenType.Bool :
+					return DataType.Bool;
+				case TokenType.Float:
+					return DataType.Float;
+				case TokenType.Float2:
+					return DataType.Float2;
+				case TokenType.Float3:
+					return DataType.Float3;
+				case TokenType.Float4:
+					return DataType.Float4;
+				case TokenType.Matrix:
+					return DataType.Matrix;
+				case TokenType.Texture2D:
+					return DataType.Texture2D;
+				default :
+					throw new NotSupportedException();
+			}
 		}
 
-		private static void SkipWhiteSpace(StringReader reader)
+		private Token EatDataType()
 		{
-			while (char.IsWhiteSpace((char)reader.Peek()))
-				reader.Read();
+			switch (PeekType())
+			{
+				case TokenType.Bool :
+				case TokenType.Float :
+				case TokenType.Float2 :
+				case TokenType.Float3 :
+				case TokenType.Float4 :
+				case TokenType.Matrix :
+				case TokenType.Texture2D:
+					return NextToken();
+			}
+			ReportError(Resources.ParserDataTypeExpected, PeekToken());
+			return ErrorToken();
 		}
 
-		private void SkipWhiteSpace()
+		private Token Eat(TokenType type)
 		{
-			SkipWhiteSpace(_fragmentReader);
+			if (PeekType() == type)
+				return NextToken();
+			ReportTokenExpectedError(type);
+			return ErrorToken();
 		}
 
-		private static void ReadKnownText(StringReader reader, string text, int lineNumber)
+		private Token NextToken()
 		{
-			char[] buffer = new char[text.Length];
-			reader.Read(buffer, 0, text.Length);
-
-			if (new string(buffer) != text)
-				throw new ParserException(string.Format("Expected '{0}'.", text), lineNumber);
+			return _tokens[_tokenIndex++];
 		}
 
-		private void ReadKnownText(string text)
+		private TokenType PeekType(int index = 0)
 		{
-			ReadKnownText(_fragmentReader, text, _lineNumber);
+			return PeekToken(index).Type;
+		}
+
+		private Token PeekToken(int index = 0)
+		{
+			return _tokens[_tokenIndex + index];
+		}
+
+		private Token ErrorToken()
+		{
+			return new Token(TokenType.Error, _path, PeekToken().Position);
+		}
+
+		private void ReportTokenExpectedError(TokenType type)
+		{
+			ReportError(Resources.ParserTokenExpected, Token.GetString(type));
+		}
+
+		private void ReportUnexpectedError(TokenType type)
+		{
+			ReportError(Resources.ParserTokenUnexpected, Token.GetString(type));
+		}
+
+		private void ReportError(string message, params object[] args)
+		{
+			ReportError(message, PeekToken(), args);
+		}
+
+		private void ReportError(string message, Token token, params object[] args)
+		{
+			BufferPosition position = token.Position;
+			if (Error != null && _lastErrorPosition != position)
+				Error(this, new ErrorEventArgs(string.Format(message, args), position));
+			_lastErrorPosition = position;
 		}
 	}
 }

@@ -1,7 +1,6 @@
-using System.Linq;
 using NUnit.Framework;
+using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
 using StitchUp.Content.Pipeline.FragmentLinking.Parser;
-using StitchUp.Content.Pipeline.Graphics;
 
 namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 {
@@ -9,118 +8,29 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 	public class FragmentParserTests
 	{
 		[Test]
-		public void CanParseInterfaceBlock()
+		public void CanParseFragmentWithParamBlock()
 		{
 			// Arrange.
-			const string interfaceBlock = @"
-				interface()
-				{
-					$name = base_texture
-					$textures = color_map
-					$params = [ world, camera_position, ambient_light_diffuse_color ]
-					$vertex = uv
-					$interpolators = uv
-					$uv = 2
-				}";
+			Lexer lexer = new Lexer(null, @"fragment basic_material;
+
+				[params]
+				float alpha : ALPHA;
+				float3 color;");
+
+			FragmentParser parser = new FragmentParser(null, lexer.GetTokens());
 
 			// Act.
-			FragmentParser parser = new FragmentParser(interfaceBlock);
-			parser.Parse();
+			FragmentNode fragment = parser.Parse();
 
 			// Assert.
-			Assert.AreEqual("base_texture", parser.Fragment.InterfaceName);
-
-			Assert.AreEqual(1, parser.Fragment.InterfaceTextures.Count);
-			Assert.AreEqual("color_map", parser.Fragment.InterfaceTextures[0]);
-
-			Assert.AreEqual(1, parser.Fragment.InterfaceVertex.Count);
-			Assert.AreEqual("uv", parser.Fragment.InterfaceVertex[0]);
-
-			Assert.AreEqual(1, parser.Fragment.InterfaceInterpolators.Count);
-			Assert.AreEqual("uv", parser.Fragment.InterfaceInterpolators[0]);
-
-			Assert.AreEqual(1, parser.Fragment.InterfaceParameterMetadata.Count);
-			Assert.AreEqual("uv", parser.Fragment.InterfaceParameterMetadata.Keys.ElementAt(0));
-			Assert.AreEqual(FragmentParameterDataType.Float2, parser.Fragment.InterfaceParameterMetadata["uv"].DataType);
-		}
-
-		[Test]
-		public void CanParseFragmentWithPixelShader()
-		{
-			// Arrange.
-			const string interfaceBlock = @"
-				interface()
-				{
-					$name = base_texture
-					$textures = color_map
-					$vertex = uv
-					$interpolators = uv
-					$uv = 2
-				}
-
-				ps 2_0
-
-				void main(INPUT input, inout OUTPUT output)
-				{
-					output.color = tex2D(color_map, input.uv);
-				}
-";
-
-			// Act.
-			FragmentParser parser = new FragmentParser(interfaceBlock);
-			parser.Parse();
-
-			// Assert.
-			Assert.AreEqual(1, parser.Fragment.CodeBlocks.Count);
-			Assert.AreEqual(FragmentCodeShaderType.PixelShader, parser.Fragment.CodeBlocks[0].ShaderType);
-			Assert.AreEqual("2_0", parser.Fragment.CodeBlocks[0].Version);
-			Assert.AreEqual(@"void main(INPUT input, inout OUTPUT output)
-				{
-					output.color = tex2D(color_map, input.uv);
-				}", parser.Fragment.CodeBlocks[0].Code);
-		}
-
-		[Test]
-		public void CanParseFragmentWithVertexShader()
-		{
-			// Arrange.
-			const string interfaceBlock = @"
-				interface()
-				{
-					$name = transform_position
-
-					$params = wvp
-					$wvp = [ matrix, semantic=""WORLDVIEWPROJECTION"" ]
-
-					$vertex = position
-					$position = [ 3, semantic=""POSITION"" ]
-				}
-
-				vs 1_1
-
-				void main(INPUT input, inout OUTPUT output)
-				{
-					output.position = mul(float4(input.position, 1), wvp);
-				}
-";
-
-			// Act.
-			FragmentParser parser = new FragmentParser(interfaceBlock);
-			parser.Parse();
-
-			// Assert.
-			Assert.AreEqual(2, parser.Fragment.InterfaceParameterMetadata.Count);
-			Assert.AreEqual(FragmentParameterDataType.Matrix, parser.Fragment.InterfaceParameterMetadata["wvp"].DataType);
-			Assert.AreEqual("WORLDVIEWPROJECTION", parser.Fragment.InterfaceParameterMetadata["wvp"].Semantic);
-			Assert.AreEqual(FragmentParameterDataType.Float3, parser.Fragment.InterfaceParameterMetadata["position"].DataType);
-			Assert.AreEqual("POSITION", parser.Fragment.InterfaceParameterMetadata["position"].Semantic);
-			Assert.AreEqual(1, parser.Fragment.CodeBlocks.Count);
-			Assert.AreEqual(FragmentCodeShaderType.VertexShader, parser.Fragment.CodeBlocks[0].ShaderType);
-			Assert.AreEqual("1_1", parser.Fragment.CodeBlocks[0].Version);
-			Assert.AreEqual(@"void main(INPUT input, inout OUTPUT output)
-				{
-					output.position = mul(float4(input.position, 1), wvp);
-				}", parser.Fragment.CodeBlocks[0].Code);
+			Assert.AreEqual("basic_material", fragment.Name);
+			Assert.IsNotNull(fragment.Parameters);
+			Assert.AreEqual(2, fragment.Parameters.VariableDeclarations.Count);
+			Assert.AreEqual(DataType.Float, fragment.Parameters.VariableDeclarations[0].DataType);
+			Assert.AreEqual("alpha", fragment.Parameters.VariableDeclarations[0].Name);
+			Assert.AreEqual("ALPHA", fragment.Parameters.VariableDeclarations[0].Semantic);
+			Assert.AreEqual(DataType.Float3, fragment.Parameters.VariableDeclarations[1].DataType);
+			Assert.AreEqual("color", fragment.Parameters.VariableDeclarations[1].Name);
 		}
 	}
 }

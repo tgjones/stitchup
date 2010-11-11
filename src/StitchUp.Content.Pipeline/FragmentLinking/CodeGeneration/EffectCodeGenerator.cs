@@ -4,23 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
 using StitchUp.Content.Pipeline.Graphics;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 {
 	public class EffectCodeGenerator
 	{
-		private readonly FragmentContentCollection _fragments;
+		private readonly StitchedEffectNode _stitchedEffect;
+		private readonly ShaderModel _targetShaderModel;
 		private readonly StringBuilder _output;
 
-		public EffectCodeGenerator(IEnumerable<FragmentContent> fragments)
+		public EffectCodeGenerator(StitchedEffectNode stitchedEffect, ShaderModel targetShaderModel)
 		{
-			_fragments = new FragmentContentCollection(fragments);
+			_stitchedEffect = stitchedEffect;
+			_targetShaderModel = targetShaderModel;
 			_output = new StringBuilder();
 		}
 
 		public string GenerateCode()
 		{
+			WriteAllHeaderCode();
 			WriteAllParams();
 			WriteAllSamplers();
 			WriteAllVertexInputStructures();
@@ -46,10 +50,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 
 		private void WriteAllVertexShaders()
 		{
-			// We keep track of what has been exported using this dictionary.
-			Dictionary<string, List<string>> exports = new Dictionary<string, List<string>>();
-
-			_fragments.ForEach((content, s) => WriteVertexShader(content, s, exports));
+			ForEachFragment(WriteVertexShader);
 
 			_output.AppendLine("// -------- vertex shader entrypoint --------");
 			_output.AppendLine("VERTEXOUTPUT vs(const VERTEXINPUT i)");
@@ -58,29 +59,34 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 			_output.AppendLine("\tVERTEXOUTPUT output = (VERTEXOUTPUT) 0;");
 			_output.AppendLine();
-			_fragments.ForEach((fragment, mangledFragmentName) => _output.AppendLineFormat("\t{0}_vs(gVertexInput.{0}, output);", mangledFragmentName));
+
+			ForEachFragment(f => _output.AppendLineFormat("\t{0}_vs(gVertexInput.{0}, output);", f.UniqueName));
+
 			_output.AppendLine();
 			_output.AppendLine("\treturn output;");
 			_output.AppendLine("}");
 			_output.AppendLine();
 		}
 
-		private void WriteVertexShader(FragmentContent fragment, string mangledFragmentName, Dictionary<string, List<string>> exports)
+		private void WriteVertexShader(StitchedFragmentNode stitchedFragment)
 		{
-			_output.AppendLineFormat("// -------- vertex shader {0} --------", mangledFragmentName);
+			_output.AppendLineFormat("// -------- vertex shader {0} --------", stitchedFragment.UniqueName);
 
-			FragmentCodeContent shader = fragment.CodeBlocks.FirstOrDefault(s => s.ShaderType == FragmentCodeShaderType.VertexShader);
+			ShaderCodeBlockNode shader = stitchedFragment.FragmentNode.VertexShaders.GetCodeBlock(_targetShaderModel);
 
 			if (shader != null)
 			{
-				WriteShaderCode(fragment, mangledFragmentName, shader, "VERTEXINPUT", "VERTEXOUTPUT", "vs", exports);
+				// Replace "passthrough(*normal*);" with code to pass vertex attribute with matching name through to interpolator.
+				string shaderCode = Regex.Replace(shader.Code, @"output\((?<NAME>[\w]+), (?<VALUE>[\s\S]+?)\);",
+					string.Format("output.{0}.${{NAME}} = ${{VALUE}};", stitchedFragment.UniqueName));
+				WriteShaderCode(stitchedFragment, shaderCode, "VERTEXINPUT", "VERTEXOUTPUT", "vs");
 			}
 			else
 			{
 				// Need to auto-generate vertex shader. Simply pass through all vertex inputs.
-				_output.AppendLineFormat("void {0}_vs({0}_VERTEXINPUT input, inout VERTEXOUTPUT output)", mangledFragmentName);
+				_output.AppendLineFormat("void {0}_vs({0}_VERTEXINPUT input, inout VERTEXOUTPUT output)", stitchedFragment.UniqueName);
 				_output.AppendLine("{");
-				fragment.InterfaceVertex.ForEach(v => _output.AppendLineFormat("\toutput.{0}.{1} = input.{1};", mangledFragmentName, v));
+				_output.Append(GetVertexPassThroughCode(stitchedFragment));
 				_output.AppendLine("}");
 			}
 
@@ -88,69 +94,50 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 		}
 
-		private void WriteShaderCode(FragmentContent fragment, string mangledFragmentName, FragmentCodeContent shader,
-			string inputStructName, string outputStructName, string functionSuffix, Dictionary<string, List<string>> exports)
+		private static string GetVertexPassThroughCode(StitchedFragmentNode stitchedFragment)
 		{
-			string mangledCode = shader.Code;
+			StringBuilder sb = new StringBuilder();
+			if (stitchedFragment.FragmentNode.VertexAttributes != null)
+				foreach (var variable in stitchedFragment.FragmentNode.VertexAttributes.VariableDeclarations)
+					sb.AppendLine(GetVertexPassThroughCode(stitchedFragment, variable));
+			return sb.ToString();
+		}
+
+		private static string GetVertexPassThroughCode(StitchedFragmentNode stitchedFragment, VariableDeclarationNode variable)
+		{
+			return string.Format("\toutput.{0}.{1} = input.{1};", stitchedFragment.UniqueName, variable.Name);
+		}
+
+		private void WriteShaderCode(StitchedFragmentNode stitchedFragment, string shaderCode,
+			string inputStructName, string outputStructName, string functionSuffix)
+		{
+			string mangledCode = shaderCode;
 
 			// Replace interpolators and sampler names which are used in the code with the mangled names.
-			fragment.InterfaceParams.ToList().ForEach(i =>
-				mangledCode = Regex.Replace(mangledCode, @"([^\w\.])(" + i + @")(\W)", "$1" + mangledFragmentName + "_$2$3"));
-			fragment.InterfaceTextures.ForEach(t =>
-				mangledCode = Regex.Replace(mangledCode, @"(\W)(" + t + @")(\W)", "$1" + mangledFragmentName + "_$2_sampler$3"));
+			mangledCode = ReplaceVariableNames(stitchedFragment, stitchedFragment.FragmentNode.Parameters, mangledCode);
+			//mangledCode = ReplaceVariableNames(stitchedFragment, stitchedFragment.FragmentNode.Interpolators, mangledCode);
+			if (stitchedFragment.FragmentNode.Textures != null)
+				stitchedFragment.FragmentNode.Textures.VariableDeclarations.ForEach(t =>
+					mangledCode = Regex.Replace(mangledCode, @"(\W)(" + t.Name + @")(\W)", "$1" + stitchedFragment.UniqueName + "_$2_sampler$3"));
 
-			// Check program for exports.
-			const string exportPattern = @"export\((?<TYPE>[\w]+), (?<NAME>[\w]+), (?<VALUE>[\s\S]+?)\);";
-			MatchCollection exportMatches = Regex.Matches(mangledCode, exportPattern);
-			foreach (Match match in exportMatches)
-			{
-				// Values might be exporting used the same name by multiple fragments; in this case, we should declare
-				// a variable for each fragment that exports the value. But if the same fragment exports a value multiple
-				// times, we should only declare the variable once.
-				string exportName = match.Groups["NAME"].Value;
-				if (!exports.ContainsKey(exportName))
-					exports[exportName] = new List<string>();
-
-				string variableName = string.Format("{0}_export_{1}", mangledFragmentName, exportName);
-				if (!exports[exportName].Contains(variableName))
-				{
-					_output.AppendLine(string.Format("static {0} {1}; // exported value", match.Groups["TYPE"].Value, variableName));
-					exports[exportName].Add(variableName);
-				}
-			}
-
-			mangledCode = mangledCode.Replace("void main(", string.Format("void {0}_{1}(", mangledFragmentName, functionSuffix));
-			mangledCode = mangledCode.Replace("INPUT", string.Format("{0}_{1}", mangledFragmentName, inputStructName));
+			mangledCode = mangledCode.Replace("void main(", string.Format("void {0}_{1}(", stitchedFragment.UniqueName, functionSuffix));
+			mangledCode = mangledCode.Replace("INPUT", string.Format("{0}_{1}", stitchedFragment.UniqueName, inputStructName));
 			mangledCode = mangledCode.Replace("OUTPUT", outputStructName);
 
-			// Check program for imports.
-			const string importPattern = @"import\((?<NAME>[\w]+), (?<OPERATION>[\s\S]+?)\);";
-			mangledCode = Regex.Replace(mangledCode, importPattern,
-				m =>
-				{
-					// Look up full variable names from matched name
-					if (!exports.ContainsKey(m.Groups["NAME"].Value))
-						throw new InvalidContentException(string.Format("Export with name '{0}' was not found.", m.Groups["NAME"].Value));
-					List<string> variableNames = exports[m.Groups["NAME"].Value];
+			_output.Append(mangledCode.Replace("\r", Environment.NewLine));
+		}
 
-					string replacement = "// metafunction: $0";
-					foreach (string variableName in variableNames)
-						replacement += string.Format("\n\t{0};",
-							Regex.Replace(m.Groups["OPERATION"].Value, @"(\W)(" + m.Groups["NAME"].Value + @")(\W|$)", "$1" + variableName + "$3")
-						);
-
-					return m.Result(replacement);
-				}
-			);
-
-			_output.Append(mangledCode);
+		private static string ReplaceVariableNames(StitchedFragmentNode stitchedFragment, ParameterBlockNode parameters, string mangledCode)
+		{
+			if (parameters != null)
+				parameters.VariableDeclarations.ToList().ForEach(i =>
+					mangledCode = Regex.Replace(mangledCode, @"([^\w\.])(" + i.Name + @")(\W)", "$1" + stitchedFragment.UniqueName + "_$2$3"));
+			return mangledCode;
 		}
 
 		private void WriteAllPixelShaders()
 		{
-			// We keep track of what has been exported using this dictionary.
-			Dictionary<string, List<string>> exports = new Dictionary<string, List<string>>();
-			_fragments.ForEach((content, s) => WritePixelShader(content, s, exports));
+			ForEachFragment(WritePixelShader);
 
 			_output.AppendLine("// -------- pixel shader entrypoint --------");
 			_output.AppendLine("PIXELOUTPUT ps(const PIXELINPUT i)");
@@ -159,11 +146,11 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 			_output.AppendLine("\tPIXELOUTPUT output = (PIXELOUTPUT) 0;");
 			_output.AppendLine();
-			_fragments.ForEach((fragment, mangledFragmentName) =>
+			ForEachFragment(f =>
 			{
-				FragmentCodeContent shader = fragment.CodeBlocks.FirstOrDefault(s => s.ShaderType == FragmentCodeShaderType.PixelShader);
+				ShaderCodeBlockNode shader = f.FragmentNode.PixelShaders.GetCodeBlock(_targetShaderModel);
 				if (shader != null)
-					_output.AppendLineFormat("\t{0}_ps(gPixelInput.{0}, output);", mangledFragmentName);
+					_output.AppendLineFormat("\t{0}_ps(gPixelInput.{0}, output);", f.UniqueName);
 			});
 			_output.AppendLine();
 			_output.AppendLine("\treturn output;");
@@ -171,14 +158,14 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 		}
 
-		private void WritePixelShader(FragmentContent fragment, string mangledFragmentName, Dictionary<string, List<string>> exports)
+		private void WritePixelShader(StitchedFragmentNode stitchedFragment)
 		{
-			FragmentCodeContent shader = fragment.CodeBlocks.FirstOrDefault(s => s.ShaderType == FragmentCodeShaderType.PixelShader);
-			if (shader != null)
+			ShaderCodeBlockNode codeBlock = stitchedFragment.FragmentNode.PixelShaders.GetCodeBlock(_targetShaderModel);
+			if (codeBlock != null)
 			{
-				_output.AppendLineFormat("// -------- pixel shader {0} --------", mangledFragmentName);
+				_output.AppendLineFormat("// -------- pixel shader {0} --------", stitchedFragment.UniqueName);
 
-				WriteShaderCode(fragment, mangledFragmentName, shader, "PIXELINPUT", "PIXELOUTPUT", "ps", exports);
+				WriteShaderCode(stitchedFragment, codeBlock.Code, "PIXELINPUT", "PIXELOUTPUT", "ps");
 
 				_output.AppendLine();
 				_output.AppendLine();
@@ -191,44 +178,58 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine("{");
 			_output.AppendLine("\tpass");
 			_output.AppendLine("\t{");
-			_output.AppendLine("\t\tVertexShader = compile vs_2_0 vs();");
-			_output.AppendLine("\t\tPixelShader = compile ps_2_0 ps();");
+			_output.AppendLineFormat("\t\tVertexShader = compile vs_{0} vs();", _targetShaderModel.GetDescription());
+			_output.AppendLineFormat("\t\tPixelShader = compile ps_{0} ps();", _targetShaderModel.GetDescription());
 			_output.AppendLine("\t}");
 			_output.AppendLine("};");
 		}
 
-		private void WriteAllParams()
+		private void WriteAllHeaderCode()
 		{
-			_fragments.ForEach(WriteParams);
+			ForEachFragment(WriteHeaderCode);
 		}
 
-		private void WriteParams(FragmentContent fragment, string mangledFragmentName)
+		private void WriteHeaderCode(StitchedFragmentNode stitchedFragment)
 		{
-			if (!fragment.InterfaceParams.Any())
+			if (stitchedFragment.FragmentNode.HeaderCode == null || string.IsNullOrEmpty(stitchedFragment.FragmentNode.HeaderCode.Code))
 				return;
 
-			_output.AppendLineFormat("// {0} params", mangledFragmentName);
-			fragment.InterfaceParams.ForEach(p => _output.AppendLine("\t" + GetVariableDeclaration(fragment, mangledFragmentName, p)));
+			_output.AppendLineFormat("// {0} header code", stitchedFragment.UniqueName);
+			_output.Append(stitchedFragment.FragmentNode.HeaderCode.Code);
+			_output.AppendLine();
+		}
+
+		private void WriteAllParams()
+		{
+			ForEachFragment(WriteParams);
+		}
+
+		private void WriteParams(StitchedFragmentNode stitchedFragment)
+		{
+			if (stitchedFragment.FragmentNode.Parameters == null || !stitchedFragment.FragmentNode.Parameters.VariableDeclarations.Any())
+				return;
+
+			_output.AppendLineFormat("// {0} params", stitchedFragment.UniqueName);
+			stitchedFragment.FragmentNode.Parameters.VariableDeclarations.ForEach(p => _output.AppendLine("\t" + GetVariableDeclaration(stitchedFragment, p)));
 			_output.AppendLine();
 		}
 
 		private void WriteAllSamplers()
 		{
-			_fragments.ForEach(WriteSamplers);
+			ForEachFragment(WriteSamplers);
 		}
 
-		private void WriteSamplers(FragmentContent fragment, string mangledFragmentName)
+		private void WriteSamplers(StitchedFragmentNode stitchedFragment)
 		{
-			if (!fragment.InterfaceTextures.Any())
+			if (stitchedFragment.FragmentNode.Textures == null || !stitchedFragment.FragmentNode.Textures.VariableDeclarations.Any())
 				return;
 
-			_output.AppendLineFormat("// {0} textures", mangledFragmentName);
-			fragment.InterfaceTextures.ForEach(t =>
+			_output.AppendLineFormat("// {0} textures", stitchedFragment.UniqueName);
+			stitchedFragment.FragmentNode.Textures.VariableDeclarations.ForEach(t =>
 			{
-				_output.AppendLineFormat(GetVariableDeclaration(fragment, mangledFragmentName, t,
-					new FragmentParameterContent { DataType = FragmentParameterDataType.Texture2D }));
+				_output.AppendLineFormat(GetVariableDeclaration(stitchedFragment, t));
 				_output.AppendLineFormat("sampler {0}_{1}_sampler = sampler_state {{ Texture = ({0}_{1}); }};",
-					mangledFragmentName, t);
+					stitchedFragment.UniqueName, t.Name);
 			});
 			_output.AppendLine();
 		}
@@ -236,12 +237,15 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 		private void WriteAllVertexInputStructures()
 		{
 			_output.AppendLine("// -------- vertex input structures --------");
+
 			int index = 0;
-			_fragments.ForEach((fragment, mangledFragmentName) => WriteVertexInputStructure(fragment, mangledFragmentName, ref index));
+			ForEachFragment(f => WriteVertexInputStructure(f, ref index));
 
 			_output.AppendLine("struct VERTEXINPUT");
 			_output.AppendLine("{");
-			_fragments.ForEach((fragment, mangledFragmentName) => _output.AppendLineFormat("\t{0}_VERTEXINPUT {0};", mangledFragmentName));
+
+			ForEachFragment(f => _output.AppendLineFormat("\t{0}_VERTEXINPUT {0};", f.UniqueName));
+
 			_output.AppendLine("};");
 			_output.AppendLine();
 			_output.AppendLine("static VERTEXINPUT gVertexInput;");
@@ -254,10 +258,10 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine("struct VERTEXOUTPUT");
 			_output.AppendLine("{");
 			_output.AppendLineFormat("\tfloat4 position : POSITION;");
-			_fragments.ForEach((fragment, mangledFragmentName) =>
+			ForEachFragment(f =>
 			{
-				if (fragment.InterfaceInterpolators.Any())
-					_output.AppendLineFormat("\t{0}_PIXELINPUT {0};", mangledFragmentName);
+				if (f.FragmentNode.Interpolators != null && f.FragmentNode.Interpolators.VariableDeclarations.Any())
+					_output.AppendLineFormat("\t{0}_PIXELINPUT {0};", f.UniqueName);
 			});
 			_output.AppendLine("};");
 			_output.AppendLine();
@@ -267,71 +271,62 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 		{
 			_output.AppendLine("// -------- pixel input structures --------");
 			int index = 0;
-			_fragments.ForEach((fragment, mangledFragmentName) => WritePixelInputStructure(fragment, mangledFragmentName, ref index));
+			
+			ForEachFragment(f => WritePixelInputStructure(f, ref index));
 
 			_output.AppendLine("struct PIXELINPUT");
 			_output.AppendLine("{");
-			_fragments.ForEach((fragment, mangledFragmentName) =>
-			{
-				if (fragment.InterfaceInterpolators.Any())
-					_output.AppendLineFormat("\t{0}_PIXELINPUT {0};", mangledFragmentName);
-			});
+			ForEachFragment(f => _output.AppendLineFormat("\t{0}_PIXELINPUT {0};", f.UniqueName));
 			_output.AppendLine("};");
 			_output.AppendLine();
 			_output.AppendLine("static PIXELINPUT gPixelInput;");
 			_output.AppendLine();
 		}
 
-		private void WriteVertexInputStructure(FragmentContent fragment, string mangledFragmentName, ref int index)
+		private void WriteVertexInputStructure(StitchedFragmentNode stitchedFragment, ref int index)
 		{
-			WriteShaderInputStructure(fragment, mangledFragmentName, ref index, "VERTEXINPUT", fragment.InterfaceVertex);
+			WriteShaderInputStructure(stitchedFragment, ref index, "VERTEXINPUT", stitchedFragment.FragmentNode.VertexAttributes, false);
 		}
 
-		private void WritePixelInputStructure(FragmentContent fragment, string mangledFragmentName, ref int index)
+		private void WritePixelInputStructure(StitchedFragmentNode stitchedFragment, ref int index)
 		{
-			if (!fragment.InterfaceInterpolators.Any())
-				return;
-
-			WriteShaderInputStructure(fragment, mangledFragmentName, ref index, "PIXELINPUT", fragment.InterfaceInterpolators);
+			WriteShaderInputStructure(stitchedFragment, ref index, "PIXELINPUT", stitchedFragment.FragmentNode.Interpolators, true);
 		}
 
-		private void WriteShaderInputStructure(FragmentContent fragment, string mangledFragmentName, ref int index, string structSuffix,
-			List<string> fields)
+		private void WriteShaderInputStructure(StitchedFragmentNode stitchedFragment, ref int index, string structSuffix,
+			ParameterBlockNode parameterBlock, bool alwaysUseTexCoords)
 		{
-			_output.AppendLineFormat("struct {0}_{1}", mangledFragmentName, structSuffix);
+			_output.AppendLineFormat("struct {0}_{1}", stitchedFragment.UniqueName, structSuffix);
 			_output.AppendLine("{");
 
 			int tempIndex = index;
-			fields.ForEach(i =>
-			{
-				FragmentParameterContent parameter = fragment.InterfaceParameterMetadata[i];
-				string semantic;
-				if (!string.IsNullOrEmpty(parameter.Semantic))
-					semantic = parameter.Semantic;
-				else
-					semantic = "TEXCOORD" + tempIndex++;
-				_output.AppendLineFormat("\t{0} {1} : {2};", FragmentParameterDataTypeUtility.ToString(parameter.DataType), i, semantic);
-			});
+			if (parameterBlock != null)
+				parameterBlock.VariableDeclarations.ForEach(v =>
+				{
+					string semantic;
+					if (!alwaysUseTexCoords && !string.IsNullOrEmpty(v.Semantic))
+						semantic = v.Semantic;
+					else
+						semantic = "TEXCOORD" + tempIndex++;
+					_output.AppendLineFormat("\t{0} {1} : {2};", DataTypeUtility.ToString(v.DataType), v.Name, semantic);
+				});
 			index = tempIndex;
 
 			_output.AppendLine("};");
 			_output.AppendLine();
 		}
 
-		private static string GetVariableDeclaration(FragmentContent fragment, string mangledFragmentName, string variableName,
-			FragmentParameterContent fallbackMetadata = null)
+		private static string GetVariableDeclaration(StitchedFragmentNode stitchedFragment, VariableDeclarationNode variable)
 		{
-			FragmentParameterContent metadata;
-			if (fragment.InterfaceParameterMetadata.ContainsKey(variableName))
-				metadata = fragment.InterfaceParameterMetadata[variableName];
-			else if (fallbackMetadata != null)
-				metadata = fallbackMetadata;
-			else
-				throw new Exception("Could not find parameter metadata and no fallback was supplied.");
+			string semantic = (!string.IsNullOrEmpty(variable.Semantic)) ? " : " + variable.Semantic : string.Empty;
+			return string.Format("{0} {1}_{2}{3};", DataTypeUtility.ToString(variable.DataType),
+				stitchedFragment.UniqueName, variable.Name, semantic);
+		}
 
-			string semantic = (!string.IsNullOrEmpty(metadata.Semantic)) ? " : " + metadata.Semantic : string.Empty;
-			return string.Format("{0} {1}_{2}{3};", FragmentParameterDataTypeUtility.ToString(metadata.DataType),
-					mangledFragmentName, variableName, semantic);
+		private void ForEachFragment(Action<StitchedFragmentNode> action)
+		{
+			foreach (StitchedFragmentNode stitchedFragmentNode in _stitchedEffect.StitchedFragments)
+				action(stitchedFragmentNode);
 		}
 	}
 }

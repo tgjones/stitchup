@@ -63,13 +63,13 @@
       <Name>Ground</Name>
       <Importer>XImporter</Importer>
       <Processor>StitchedEffectModelProcessor</Processor>
-      <ProcessorParameters_StitchedEffect>Shaders\BasicEffect.effect</ProcessorParameters_StitchedEffect>
+      <ProcessorParameters_StitchedEffect>Shaders\BasicEffect.stitchedeffect</ProcessorParameters_StitchedEffect>
     </Compile>
     <Compile Include="Ship.fbx">
       <Name>Ship</Name>
       <Importer>FbxImporter</Importer>
       <Processor>StitchedEffectModelProcessor</Processor>
-      <ProcessorParameters_StitchedEffect>Shaders\BasicEffect.effect</ProcessorParameters_StitchedEffect>
+      <ProcessorParameters_StitchedEffect>Shaders\BasicEffect.stitchedeffect</ProcessorParameters_StitchedEffect>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -84,11 +84,11 @@
       <Importer>FragmentImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
     </Compile>
-    <Compile Include="Shaders\BasicEffect.effect">
+    <None Include="Shaders\BasicEffect.stitchedeffect">
       <Name>BasicEffect</Name>
       <Importer>StitchedEffectImporter</Importer>
       <Processor>StitchedEffectProcessor</Processor>
-    </Compile>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Shaders\Fragments\VertexTypes\PositionNormalTexture.fragment">

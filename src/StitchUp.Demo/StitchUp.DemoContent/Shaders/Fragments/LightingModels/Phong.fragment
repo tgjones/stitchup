@@ -1,29 +1,26 @@
-﻿interface()
-{
-	$name = phong
+﻿fragment phong;
 
-	$params = [ world, camera_position, ambient_light_diffuse_color ]
+[params]
+matrix world : WORLD;
+float3 camera_position : CAMERA_POSITION;
+float4 ambient_light_diffuse_color : AMBIENT_LIGHT_DIFFUSE_COLOR;
 
-	$world = matrix
-	$camera_position = 3
-	$ambient_light_diffuse_color = 4
+[interpolators]
+float3 world_position;
 
-	$interpolators = world_position
-
-	$world_position = 3
-}
-
-vs 2_0
-
+[vs 2_0]
+__hlsl__
 void main(INPUT input, inout OUTPUT output)
 {
 	float3 input_pos;
 	import(input_position, input_pos = input_position);
 	
-	output.world_position = mul(float4(input_pos, 1), world);
+	output(world_position, mul(float4(input_pos, 1), world));
 }
+__hlsl__
 
-ps 2_0
+[ps 2_0]
+__hlsl__
 
 float4 process_light(light light, float3 cameraPosition,
 	float3 worldPosition, float3 worldNormal,
@@ -46,7 +43,7 @@ float4 process_light(light light, float3 cameraPosition,
 	// Because of this, specular light is view-dependent -- its intensity depends
 	// on the angle between the light vector and the view vector. Specular lighting
 	// is responsible for creating the highlights that make an object look shiny.
-	float4 specular = saturate(light.DiffuseColour * materialSpecularColour * materialSpecularIntensity *
+	float4 specular = saturate(light.diffuse_color * materialSpecularColour * materialSpecularIntensity *
 														 pow(saturate(dot(reflectionVector, directionToCamera)),
 																 materialSpecularPower));
 	
@@ -64,10 +61,10 @@ void main(INPUT input, inout OUTPUT output)
 	// Import material properties.
 	float4 materialDiffuseColour, materialSpecularColour;
 	float materialSpecularIntensity, materialSpecularPower;
-	import(diffuse_color, materialDiffuseColour = diffuse_color);
-	import(specular_color, materialSpecularColour = specular_color);
-	import(specular_intensity, materialSpecularIntensity = specular_intensity);
-	import(specular_power, materialSpecularPower = specular_power);
+	import(material_diffuse_color, materialDiffuseColour = material_diffuse_color);
+	import(material_specular_color, materialSpecularColour = material_specular_color);
+	import(material_specular_intensity, materialSpecularIntensity = material_specular_intensity);
+	import(material_specular_power, materialSpecularPower = material_specular_power);
 	
 	// Calculate ambient colour.
 	// Ambient light is a constant amount of light that gets added to the scene no matter what.
@@ -84,3 +81,5 @@ void main(INPUT input, inout OUTPUT output)
 
 	export(float4, light_color, final_color);
 }
+
+__hlsl__

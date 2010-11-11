@@ -1,8 +1,14 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration;
+using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
+using StitchUp.Content.Pipeline.FragmentLinking.PreProcessor;
 using StitchUp.Content.Pipeline.Graphics;
 
 namespace StitchUp.Content.Pipeline.Processors
@@ -15,11 +21,29 @@ namespace StitchUp.Content.Pipeline.Processors
 			// Load fragments.
 			IEnumerable<FragmentContent> fragments = LoadFragments(context, input.Fragments);
 
+			// Load into intermediate objects which keep track of each fragment's unique name.
+			List<StitchedFragmentNode> stitchedFragments = fragments
+				.Select((f, i) => new StitchedFragmentNode(f.FragmentNode.Name + i, f.FragmentNode))
+				.ToList();
+
+			// Load into intermediate object, which keeps track of each 
+			StitchedEffectNode stitchedEffect = new StitchedEffectNode(stitchedFragments);
+
+			// Pre-process stitched effect - this replaces the export / import calls with their expansions.
+			StitchedEffectPreProcessor preProcessor = new StitchedEffectPreProcessor();
+			preProcessor.PreProcess(stitchedEffect);
+
+			// Find out which shader model to compile for.
+			ShaderModel shaderModel = GetTargetShaderModel(stitchedEffect);
+
 			// Generate effect code.
-			EffectCodeGenerator codeGenerator = new EffectCodeGenerator(fragments);
+			EffectCodeGenerator codeGenerator = new EffectCodeGenerator(stitchedEffect, shaderModel);
 			string effectCode = codeGenerator.GenerateCode();
 
+			// Save effect code so that if there are errors, we'll be able to view the generated .fx file.
 			context.Logger.LogImportantMessage(effectCode.Replace("{", "{{").Replace("}", "}}"));
+			string tempEffectFile = Path.Combine(Path.GetTempPath(), "StitchedEffect.fx");
+			File.WriteAllText(tempEffectFile, effectCode, Encoding.GetEncoding(1252));
 
 			// Process effect code.
 			EffectProcessor effectProcessor = new EffectProcessor
@@ -27,13 +51,23 @@ namespace StitchUp.Content.Pipeline.Processors
 				DebugMode = EffectProcessorDebugMode.Auto,
 				Defines = null
 			};
+
 			EffectContent effectContent = new EffectContent
 			{
 				EffectCode = effectCode,
-				Identity = input.Identity,
+				Identity = new ContentIdentity(tempEffectFile),
 				Name = input.Name
 			};
+
 			return effectProcessor.Process(effectContent, context);
+		}
+
+		private static ShaderModel GetTargetShaderModel(StitchedEffectNode stitchedEffect)
+		{
+			foreach (ShaderModel shaderModel in Enum.GetValues(typeof(ShaderModel)))
+				if (stitchedEffect.CanBeCompiledForShaderModel(shaderModel))
+					return shaderModel;
+			throw new InvalidContentException("Could not find shader model compatible with this stitched effect.");
 		}
 
 		private static IEnumerable<FragmentContent> LoadFragments(ContentProcessorContext context, IEnumerable<string> fragmentAssetNames)

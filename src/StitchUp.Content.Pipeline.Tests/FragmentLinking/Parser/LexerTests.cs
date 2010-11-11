@@ -52,22 +52,6 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 		}
 
 		[Test]
-		public void CanLexEmptyFragment()
-		{
-			// Arrange.
-			Lexer lexer = new Lexer(null, "fragment { }");
-
-			// Act.
-			var tokens = lexer.GetTokens();
-
-			// Assert.
-			Assert.AreEqual(3, tokens.Count());
-			Assert.AreEqual(TokenType.Fragment, tokens[0].Type);
-			Assert.AreEqual(TokenType.OpenCurly, tokens[1].Type);
-			Assert.AreEqual(TokenType.CloseCurly, tokens[2].Type);
-		}
-
-		[Test]
 		public void CanLexFragmentWithVertexParameters()
 		{
 			// Arrange.
@@ -81,7 +65,7 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 			var tokens = lexer.GetTokens();
 
 			// Assert.
-			Assert.AreEqual(14, tokens.Count());
+			Assert.AreEqual(15, tokens.Count());
 			Assert.AreEqual(TokenType.Fragment, tokens[0].Type);
 			Assert.AreEqual(TokenType.Identifier, tokens[1].Type);
 			Assert.AreEqual("MyFragment", ((IdentifierToken)tokens[1]).Identifier);
@@ -101,26 +85,34 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 			Assert.AreEqual(TokenType.Identifier, tokens[12].Type);
 			Assert.AreEqual("texCoord", ((IdentifierToken)tokens[12]).Identifier);
 			Assert.AreEqual(TokenType.Semicolon, tokens[13].Type);
+			Assert.AreEqual(TokenType.Eof, tokens[14].Type);
 		}
 
-		/*[Test]
+		[Test]
 		public void CanLexCodeBlock()
 		{
 			// Arrange.
-			Lexer lexer = new Lexer(null, @"vs 2_0
-				
+			Lexer lexer = new Lexer(null, @"[vs 2_0]
+				__hlsl__
 				void main(INPUT input, inout OUTPUT output)
 				{
-				}");
+				}
+				__hlsl__");
 
 			// Act.
 			var tokens = lexer.GetTokens();
 
 			// Assert.
-			Assert.AreEqual(3, tokens.Count());
-			Assert.AreEqual(TokenType.VertexShader, tokens[0].Type);
-			Assert.AreEqual(TokenType.OpenCurly, tokens[1].Type);
-			Assert.AreEqual(TokenType.CloseCurly, tokens[2].Type);
-		}*/
+			Assert.AreEqual(6, tokens.Count());
+			Assert.AreEqual(TokenType.OpenSquare, tokens[0].Type);
+			Assert.AreEqual(TokenType.Identifier, tokens[1].Type);
+			Assert.AreEqual("vs", ((IdentifierToken)tokens[1]).Identifier);
+			Assert.AreEqual(TokenType.Identifier, tokens[2].Type);
+			Assert.AreEqual("2_0", ((IdentifierToken)tokens[2]).Identifier);
+			Assert.AreEqual(TokenType.CloseSquare, tokens[3].Type);
+			Assert.AreEqual(TokenType.ShaderCode, tokens[4].Type);
+			Assert.AreEqual("void main(INPUT input, inout OUTPUT output)\r\t\t\t\t{\r\t\t\t\t}", ((ShaderCodeToken)tokens[4]).ShaderCode);
+			Assert.AreEqual(TokenType.Eof, tokens[5].Type);
+		}
 	}
 }

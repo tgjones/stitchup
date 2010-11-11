@@ -1,10 +1,7 @@
-﻿interface()
-{
-	$name = pixel_color_output
-}
+﻿fragment pixel_color_output;
 
-ps 1_1
-
+[ps 1_1]
+__hlsl__
 void main(INPUT input, inout OUTPUT output)
 {
 	// Add light colours together.
@@ -12,3 +9,4 @@ void main(INPUT input, inout OUTPUT output)
 	import(light_color, total_light_color += light_color);
 	output.color = total_light_color;
 }
+__hlsl__

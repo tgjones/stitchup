@@ -1,26 +1,25 @@
-﻿interface()
-{
-	$name = position_normal_texture
+﻿fragment position_normal_texture;
 
-	$vertex = [ position, normal ]
-	$position = 3
-	$normal = 3
+[vertexattributes]
+float3 position : POSITION;
+float3 normal : NORMAL;
 
-	$interpolators = normal
-}
+[interpolators]
+float3 normal;
 
-vs 1_1
-
+[vs 1_1]
+__hlsl__
 void main(INPUT input, inout OUTPUT output)
 {
-	export(float3, input_position, input.Position);
-
-	output.Normal = input.normal;
+	export(float3, input_position, input.position);
+	output(normal, input.normal);
 }
+__hlsl__
 
-ps 1_1
-
+[ps 1_1]
+__hlsl__
 void main(INPUT input, inout OUTPUT output)
 {
 	export(float3, world_normal, input.normal);
 }
+__hlsl__

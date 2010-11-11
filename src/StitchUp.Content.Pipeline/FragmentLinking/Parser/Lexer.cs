@@ -72,6 +72,18 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					return new StringToken(value, _path, TakePosition());
 				}
 				default :
+					const string hlslDelimiter = "__hlsl__";
+					if (c == hlslDelimiter[0] && PeekIdentifier(hlslDelimiter, 1))
+					{
+						EatIdentifier(hlslDelimiter, 1);
+
+						string shaderCode = EatWhile(c2 => !IsEof && !PeekIdentifier(hlslDelimiter, 0));
+						ShaderCodeToken codeToken = new ShaderCodeToken(shaderCode.Trim(), _path, TakePosition());
+
+						EatIdentifier(hlslDelimiter, 0);
+
+						return codeToken;
+					}
 					if (IsIdentifierChar(c))
 					{
 						string identifier = c + EatWhile(IsIdentifierChar);
@@ -82,6 +94,21 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					ReportError(Resources.LexerUnexpectedCharacter, c);
 					return ErrorToken();
 			}
+		}
+
+		private bool PeekIdentifier(string identifier, int startIndex)
+		{
+			int index = 0;
+			for (int i = startIndex; i < identifier.Length; ++i)
+				if (PeekChar(index++) != identifier[i])
+					return false;
+			return true;
+		}
+
+		private void EatIdentifier(string identifier, int startIndex)
+		{
+			for (int i = startIndex; i < identifier.Length; ++i)
+				NextChar();
 		}
 
 		private static bool IsIdentifierChar(char c)

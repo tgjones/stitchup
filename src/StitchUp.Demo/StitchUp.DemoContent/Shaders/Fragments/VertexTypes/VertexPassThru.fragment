@@ -1,20 +1,15 @@
-﻿interface()
-{
-	$name = vertex_pass_thru
+﻿fragment vertex_pass_thru;
 
-	$params = wvp
-	$wvp = [ matrix, semantic="WORLDVIEWPROJECTION" ]
+[parameters]
+matrix wvp : WORLDVIEWPROJECTION;
 
-	$interpolators = position
-	$position = [ 4, semantic="POSITION" ]
-}
-
-vs 1_1
-
+[vs 1_1]
+__hlsl__
 void main(INPUT input, inout OUTPUT output)
 {
 	float3 input_pos;
 	import(input_position, input_pos = input_position);
 	
-	output.position = mul(float4(input_pos, 1), WorldViewProjection);
+	output.position = mul(float4(input_pos, 1), wvp);
 }
+__hlsl__
