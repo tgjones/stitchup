@@ -1,0 +1,86 @@
+﻿interface()
+{
+	$name = phong
+
+	$params = [ world, camera_position, ambient_light_diffuse_color ]
+
+	$world = matrix
+	$camera_position = 3
+	$ambient_light_diffuse_color = 4
+
+	$interpolators = world_position
+
+	$world_position = 3
+}
+
+vs 2_0
+
+void main(INPUT input, inout OUTPUT output)
+{
+	float3 input_pos;
+	import(input_position, input_pos = input_position);
+	
+	output.world_position = mul(float4(input_pos, 1), world);
+}
+
+ps 2_0
+
+float4 process_light(light light, float3 cameraPosition,
+	float3 worldPosition, float3 worldNormal,
+	float4 materialDiffuseColour, float4 materialSpecularColour,
+	float materialSpecularIntensity, float materialSpecularPower)
+{
+	// Diffuse light is light that hits a surface and gets scattered equally into all directions.
+	// Its intensity depends on the angle at which the light strikes the surface, i.e. the angle
+	// between the light vector and the surface normal. The bigger the angle,
+	// the less bright the surface will appear.
+	float diffuseIntensity = saturate(dot(light.direction_to_light, worldNormal));
+	float4 diffuse = diffuseIntensity * light.diffuse_color * materialDiffuseColour;
+
+	// Calculate Phong components per-pixel.
+	float3 reflectionVector = normalize(reflect(-light.direction_to_light, worldNormal));
+	float3 directionToCamera = normalize(cameraPosition - worldPosition);
+
+	// Calculate specular component.
+	// Specular light is light that gets reflected in a particular direction.
+	// Because of this, specular light is view-dependent -- its intensity depends
+	// on the angle between the light vector and the view vector. Specular lighting
+	// is responsible for creating the highlights that make an object look shiny.
+	float4 specular = saturate(light.DiffuseColour * materialSpecularColour * materialSpecularIntensity *
+														 pow(saturate(dot(reflectionVector, directionToCamera)),
+																 materialSpecularPower));
+	
+	return diffuse + specular;
+}
+
+void main(INPUT input, inout OUTPUT output)
+{
+	// Import world normal - this will have either been exported by a simple pass-through
+	// fragment which exported the normal coming from the vertex shader, or else it
+	// might be a normal that was retrieved from a terrain normal map.
+	float3 normal;
+	import(world_normal, normal = world_normal);
+	
+	// Import material properties.
+	float4 materialDiffuseColour, materialSpecularColour;
+	float materialSpecularIntensity, materialSpecularPower;
+	import(diffuse_color, materialDiffuseColour = diffuse_color);
+	import(specular_color, materialSpecularColour = specular_color);
+	import(specular_intensity, materialSpecularIntensity = specular_intensity);
+	import(specular_power, materialSpecularPower = specular_power);
+	
+	// Calculate ambient colour.
+	// Ambient light is a constant amount of light that gets added to the scene no matter what.
+	// It's goal is to fake the contribution of indirect reflections, which can normally only be
+	// accounted for using global illumination solutions. The ambient term is used simply to
+	// keep shadows from turning pitch black, which would be very unrealistic.
+	float4 ambient = ambient_light_diffuse_color * materialDiffuseColour;
+	
+	// Now we import whatever lights have been exported by previous light fragments,
+	// and process them one-by-one. Because light is additive, the final intensity of the light
+	// reflected by a given surface is simply the sum of the ambient, diffuse and specular components.
+	float4 final_color = ambient;
+	import(light, final_color += process_light(light, camera_position, input.world_position, normal, materialDiffuseColour, materialSpecularColour, materialSpecularIntensity, materialSpecularPower));
+
+	export(float4, light_color, final_color);
+}

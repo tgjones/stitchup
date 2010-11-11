@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using StitchUp.Content.Pipeline.Graphics;
-using StitchUp.Content.Pipeline.Parser;
 
 namespace StitchUp.Content.Pipeline
 {

@@ -1,0 +1,26 @@
+﻿interface()
+{
+	$name = position_normal_texture
+
+	$vertex = [ position, normal ]
+	$position = 3
+	$normal = 3
+
+	$interpolators = normal
+}
+
+vs 1_1
+
+void main(INPUT input, inout OUTPUT output)
+{
+	export(float3, input_position, input.Position);
+
+	output.Normal = input.normal;
+}
+
+ps 1_1
+
+void main(INPUT input, inout OUTPUT output)
+{
+	export(float3, world_normal, input.normal);
+}

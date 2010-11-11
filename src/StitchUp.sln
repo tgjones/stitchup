@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchUp", "StitchUp\Stitch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchUp.Demo", "StitchUp.Demo\StitchUp.Demo\StitchUp.Demo.csproj", "{C9CC4A7E-7D1B-437F-95F1-E6316D3775DB}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "StitchUp.DemoContent", "StitchUp.Demo\StitchUp.DemoContent\StitchUp.DemoContent.contentproj", "{F77C2CD7-D01C-4214-88DE-1C8E8619A73F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchUp.DemoContent", "StitchUp.Demo\StitchUp.DemoContent\StitchUp.DemoContent.contentproj", "{F77C2CD7-D01C-4214-88DE-1C8E8619A73F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchUp.Content.Pipeline.Tests", "StitchUp.Content.Pipeline.Tests\StitchUp.Content.Pipeline.Tests.csproj", "{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}"
 EndProject
@@ -43,7 +43,6 @@ Global
 		{B85179A4-956A-4CB4-A4AC-56BAB982C3C0}.Release|x86.Build.0 = Release|x86
 		{C9CC4A7E-7D1B-437F-95F1-E6316D3775DB}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{C9CC4A7E-7D1B-437F-95F1-E6316D3775DB}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{C9CC4A7E-7D1B-437F-95F1-E6316D3775DB}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{C9CC4A7E-7D1B-437F-95F1-E6316D3775DB}.Debug|x86.ActiveCfg = Debug|x86
 		{C9CC4A7E-7D1B-437F-95F1-E6316D3775DB}.Debug|x86.Build.0 = Debug|x86
 		{C9CC4A7E-7D1B-437F-95F1-E6316D3775DB}.Release|Any CPU.ActiveCfg = Release|x86

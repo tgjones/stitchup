@@ -1,0 +1,25 @@
+﻿interface()
+{
+	$name = directional_light
+
+	$params = [ direction, diffuse_color ]
+
+	$direction = 3
+	$diffuse_color = 4
+}
+
+ps 1_1
+
+struct light
+{
+	float3 direction_to_light;
+	float4 diffuse_color;
+};
+
+void main(INPUT input, inout OUTPUT output)
+{
+	light light;
+	light.direction_to_light = -direction;
+	light.diffuse_color = diffuse_color;
+	export(light, light, light);
+}

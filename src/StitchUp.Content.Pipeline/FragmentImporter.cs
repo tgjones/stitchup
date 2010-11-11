@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using StitchUp.Content.Pipeline.FragmentLinking.Parser;
 using StitchUp.Content.Pipeline.Graphics;
-using StitchUp.Content.Pipeline.Parser;
 
 namespace StitchUp.Content.Pipeline
 {
@@ -20,7 +20,15 @@ namespace StitchUp.Content.Pipeline
 				throw new FileNotFoundException("File not found", filename);
 
 			FragmentParser parser = new FragmentParser(File.ReadAllText(filename));
-			parser.Parse();
+
+			try
+			{
+				parser.Parse();
+			}
+			catch (ParserException ex)
+			{
+				throw new InvalidContentException(ex.Message, new ContentIdentity(info.FullName, "Fragment Importer", ex.LineNumber.ToString()), ex);
+			}
 
 			FragmentContent content = parser.Fragment;
 			content.Identity = new ContentIdentity(info.FullName, "Fragment Importer");

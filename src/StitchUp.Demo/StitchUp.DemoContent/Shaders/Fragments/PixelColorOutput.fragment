@@ -1,0 +1,14 @@
+﻿interface()
+{
+	$name = pixel_color_output
+}
+
+ps 1_1
+
+void main(INPUT input, inout OUTPUT output)
+{
+	// Add light colours together.
+	float4 total_light_color = float4(0, 0, 0, 0);
+	import(light_color, total_light_color += light_color);
+	output.color = total_light_color;
+}

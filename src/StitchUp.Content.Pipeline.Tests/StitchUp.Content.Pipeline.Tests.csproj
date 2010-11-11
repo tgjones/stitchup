@@ -45,6 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FragmentLinking\Parser\FragmentParserTests.cs" />
+    <Compile Include="FragmentLinking\Parser\LexerTests.cs" />
+    <Compile Include="FragmentLinking\Parser\ParserTests.cs" />
+    <Compile Include="FragmentLinking\Parser\TextBufferTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

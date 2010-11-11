@@ -1,2 +1,6 @@
-﻿Shaders\Fragments\TransformPosition.fragment
-Shaders\Fragments\BaseTexture.fragment
+﻿Shaders\Fragments\VertexTypes\PositionNormalTexture.fragment
+Shaders\Fragments\VertexTypes\VertexPassThru.fragment
+Shaders\Fragments\BasicMaterial.fragment
+Shaders\Fragments\Lights\DirectionalLight.fragment
+Shaders\Fragments\LightingModels\Phong.fragment
+Shaders\Fragments\PixelColorOutput.fragment

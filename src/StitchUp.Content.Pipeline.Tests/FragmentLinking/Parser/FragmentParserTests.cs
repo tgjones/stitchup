@@ -1,9 +1,9 @@
 using System.Linq;
 using NUnit.Framework;
+using StitchUp.Content.Pipeline.FragmentLinking.Parser;
 using StitchUp.Content.Pipeline.Graphics;
-using StitchUp.Content.Pipeline.Parser;
 
-namespace StitchUp.Content.Pipeline.Tests.Parser
+namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 {
 	[TestFixture]
 	public class FragmentParserTests
@@ -17,6 +17,7 @@ namespace StitchUp.Content.Pipeline.Tests.Parser
 				{
 					$name = base_texture
 					$textures = color_map
+					$params = [ world, camera_position, ambient_light_diffuse_color ]
 					$vertex = uv
 					$interpolators = uv
 					$uv = 2
