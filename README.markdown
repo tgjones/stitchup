@@ -50,11 +50,11 @@ Stitched effect file:
 ### How to use StitchUp
 
 1. Add `StitchUp.Content.Pipeline.dll` as a reference to your content project.
-2. Create fragments and stitched effect files as needed. If you use `.fragment` and `stitchedeffect`
+2. Create fragments and stitched effect files as needed. If you use `.fragment` and `.stitchedeffect`
    as the file extensions, the files should automatically be linked to the correct StitchUp
    importers and processors. You don't need a processor for `.fragment` files.
-3. You can either load the stitched effect (in the same way as you would load a normal effect),
-   or you can use the StitchUp Model Processor to associate the effect with a model at compile-time.
+3. You can either load the stitched effect at runtime (in the same way as you would load a normal effect),
+   or you can use the StitchUp model processor to associate the effect with a model at compile-time.
    To do this:
    1. Select the model in your content project.
    2. Change the Content Processor to "Model - StitchUp".
