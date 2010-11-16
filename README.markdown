@@ -33,7 +33,7 @@ Fragment file:
 	[interpolators]
 	float2 uv;
 	
-	[ps 1_1]
+	[ps 2_0]
 	__hlsl__
 	void main(INPUT input, inout OUTPUT output)
 	{
