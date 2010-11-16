@@ -129,6 +129,9 @@
   <data name="ParserParameterBlockTypeExpected" xml:space="preserve">
     <value>Block type (parameters, interpolators, vertexattributes, textures, vs, ps) expected, but found '{0}'.</value>
   </data>
+  <data name="ParserShaderModelNotSupported" xml:space="preserve">
+    <value>Shader model '{0}' is not supported. Only 2_0 and 3_0 are supported.</value>
+  </data>
   <data name="ParserTokenExpected" xml:space="preserve">
     <value>Syntax error: '{0}' expected.</value>
   </data>

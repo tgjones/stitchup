@@ -125,19 +125,16 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			}
 		}
 
-		private static ShaderModel GetShaderModel(IdentifierToken model)
+		private ShaderModel GetShaderModel(IdentifierToken model)
 		{
 			switch (model.Identifier)
 			{
-				case "1_0":
-					return ShaderModel.Version1_0;
-				case "1_1":
-					return ShaderModel.Version1_1;
 				case "2_0":
 					return ShaderModel.Version2_0;
 				case "3_0":
 					return ShaderModel.Version3_0;
 				default:
+					ReportError(Resources.ParserShaderModelNotSupported, model.Identifier);
 					throw new NotSupportedException();
 			}
 		}

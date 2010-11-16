@@ -10,13 +10,13 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.CodeModel
 		public void CanGetDescription()
 		{
 			// Arrange.
-			ShaderModel shaderModel = ShaderModel.Version1_0;
+			const ShaderModel shaderModel = ShaderModel.Version2_0;
 
 			// Act.
 			string description = shaderModel.GetDescription();
 
 			// Assert.
-			Assert.AreEqual("1_0", description);
+			Assert.AreEqual("2_0", description);
 		}
 	}
 }

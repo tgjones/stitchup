@@ -3,7 +3,7 @@
 [parameters]
 matrix wvp : WORLDVIEWPROJECTION;
 
-[vs 1_1]
+[vs 2_0]
 __hlsl__
 void main(INPUT input, inout OUTPUT output)
 {
