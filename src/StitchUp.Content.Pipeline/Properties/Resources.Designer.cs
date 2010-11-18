@@ -88,6 +88,15 @@ namespace StitchUp.Content.Pipeline.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Initial value was not expected for this type of parameter block..
+        /// </summary>
+        internal static string ParserInitialValueUnexpected {
+            get {
+                return ResourceManager.GetString("ParserInitialValueUnexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Block type (parameters, interpolators, vertexattributes, textures, vs, ps) expected, but found &apos;{0}&apos;..
         /// </summary>
         internal static string ParserParameterBlockTypeExpected {

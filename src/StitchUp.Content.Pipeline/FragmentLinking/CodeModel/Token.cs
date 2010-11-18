@@ -23,6 +23,11 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 			Position = position;
 		}
 
+		public override string ToString()
+		{
+			return GetString(Type);
+		}
+
 		public static bool IsKeyword(TokenType type)
 		{
 			return (type < TokenType.Identifier);

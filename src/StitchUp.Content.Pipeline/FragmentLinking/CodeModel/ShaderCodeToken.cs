@@ -11,5 +11,10 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		{
 			ShaderCode = shaderCode;
 		}
+
+		public override string ToString()
+		{
+			return ShaderCode;
+		}
 	}
 }

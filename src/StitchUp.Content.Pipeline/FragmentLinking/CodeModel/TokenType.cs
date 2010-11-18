@@ -31,7 +31,13 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		[Description("texture2D")]
 		Texture2D,
 
-		[Description("Identifier")]
+		[Description("true")]
+		True,
+
+		[Description("false")]
+		False,
+
+		[Description("Identifier")] // Everything before this is a keyword.
 		Identifier,
 
 		[Description("EOF")]
@@ -49,17 +55,23 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		[Description("}")]
 		CloseCurly,
 
+		[Description("(")]
+		OpenParen,
+
+		[Description(")")]
+		CloseParen,
+
 		[Description("=")]
 		Equal,
+
+		[Description("-")]
+		Minus,
 
 		[Description(",")]
 		Comma,
 
 		[Description(":")]
 		Colon,
-
-		[Description("String")]
-		String,
 
 		[Description("Error")]
 		Error,
@@ -68,6 +80,9 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		Semicolon,
 
 		[Description("Shader Code")]
-		ShaderCode
+		ShaderCode,
+
+		[Description("Literal")]
+		Literal
 	}
 }

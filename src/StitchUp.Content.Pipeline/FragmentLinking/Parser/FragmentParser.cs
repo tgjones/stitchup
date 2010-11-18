@@ -145,7 +145,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 
 			ParameterBlockType blockType = GetParameterBlockType(blockName);
 
-			List<VariableDeclarationNode> variableDeclarations = ParseVariableDeclarations();
+			bool allowInitialValue = (blockType == ParameterBlockType.Parameters);
+			List<VariableDeclarationNode> variableDeclarations = ParseVariableDeclarations(allowInitialValue);
 			return new ParameterBlockNode
 			{
 				Type = blockType,
@@ -175,17 +176,17 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			}
 		}
 
-		private List<VariableDeclarationNode> ParseVariableDeclarations()
+		private List<VariableDeclarationNode> ParseVariableDeclarations(bool allowInitialValue)
 		{
 			List<VariableDeclarationNode> result = new List<VariableDeclarationNode>();
 
 			while (PeekType() != TokenType.OpenSquare && PeekType() != TokenType.Eof)
-				result.Add(ParseVariableDeclaration());
+				result.Add(ParseVariableDeclaration(allowInitialValue));
 
 			return result;
 		}
 
-		private VariableDeclarationNode ParseVariableDeclaration()
+		private VariableDeclarationNode ParseVariableDeclaration(bool allowInitialValue)
 		{
 			Token dataType = EatDataType();
 			IdentifierToken variableName = (IdentifierToken) Eat(TokenType.Identifier);
@@ -197,13 +198,25 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 				semantic = ((IdentifierToken) Eat(TokenType.Identifier)).Identifier;
 			}
 
+			string initialValue = null;
+			if (PeekType() == TokenType.Equal)
+			{
+				if (!allowInitialValue)
+					ReportError(Resources.ParserInitialValueUnexpected);
+
+				Eat(TokenType.Equal);
+				while (PeekType() != TokenType.Semicolon)
+					initialValue += NextToken().ToString();
+			}
+
 			Eat(TokenType.Semicolon);
 
 			return new VariableDeclarationNode
 			{
 				Name = variableName.Identifier,
 				DataType = GetDataType(dataType.Type),
-				Semantic = semantic
+				Semantic = semantic,
+				InitialValue = initialValue
 			};
 		}
 

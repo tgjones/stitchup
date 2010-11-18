@@ -11,5 +11,10 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		{
 			Identifier = identifier;
 		}
+
+		public override string ToString()
+		{
+			return Identifier;
+		}
 	}
 }

@@ -51,8 +51,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FragmentLinking\CodeModel\IntToken.cs" />
+    <Compile Include="FragmentLinking\CodeModel\FloatToken.cs" />
+    <Compile Include="FragmentLinking\CodeModel\LiteralToken.cs" />
     <Compile Include="FragmentLinking\CodeModel\HeaderCodeBlockNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\CodeBlockNodeBase.cs" />
+    <Compile Include="FragmentLinking\CodeModel\LiteralTokenType.cs" />
     <Compile Include="FragmentLinking\CodeModel\ShaderCodeBlockNodeCollection.cs" />
     <Compile Include="FragmentLinking\CodeModel\EnumExtensionMethods.cs" />
     <Compile Include="FragmentLinking\CodeModel\ParameterBlockType.cs" />

@@ -319,8 +319,9 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 		private static string GetVariableDeclaration(StitchedFragmentNode stitchedFragment, VariableDeclarationNode variable)
 		{
 			string semantic = (!string.IsNullOrEmpty(variable.Semantic)) ? " : " + variable.Semantic : string.Empty;
-			return string.Format("{0} {1}_{2}{3};", DataTypeUtility.ToString(variable.DataType),
-				stitchedFragment.UniqueName, variable.Name, semantic);
+			string initialValue = (!string.IsNullOrEmpty(variable.InitialValue)) ? " = " + variable.InitialValue : string.Empty;
+			return string.Format("{0} {1}_{2}{3}{4};", DataTypeUtility.ToString(variable.DataType),
+				stitchedFragment.UniqueName, variable.Name, semantic, initialValue);
 		}
 
 		private void ForEachFragment(Action<StitchedFragmentNode> action)

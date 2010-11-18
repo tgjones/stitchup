@@ -42,7 +42,7 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 		[Test]
 		public void CanLexString()
 		{
-			TestTokenType("\"this is a string\"", TokenType.String);
+			TestTokenType("\"this is a string\"", TokenType.Literal);
 		}
 
 		[Test]
@@ -78,12 +78,126 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 			Assert.AreEqual(TokenType.Identifier, tokens[7].Type);
 			Assert.AreEqual("normal", ((IdentifierToken)tokens[7]).Identifier);
 			Assert.AreEqual(TokenType.Colon, tokens[8].Type);
-			Assert.AreEqual(TokenType.String, tokens[9].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[9].Type);
 			Assert.AreEqual("NORMAL", ((StringToken)tokens[9]).Value);
 			Assert.AreEqual(TokenType.Semicolon, tokens[10].Type);
 			Assert.AreEqual(TokenType.Float2, tokens[11].Type);
 			Assert.AreEqual(TokenType.Identifier, tokens[12].Type);
 			Assert.AreEqual("texCoord", ((IdentifierToken)tokens[12]).Identifier);
+			Assert.AreEqual(TokenType.Semicolon, tokens[13].Type);
+			Assert.AreEqual(TokenType.Eof, tokens[14].Type);
+		}
+
+		[Test]
+		public void CanLexDeclarationWithSemantic()
+		{
+			// Arrange.
+			Lexer lexer = new Lexer(null, @"float3 normal : ""NORMAL"";");
+
+			// Act.
+			var tokens = lexer.GetTokens();
+
+			// Assert.
+			Assert.AreEqual(6, tokens.Count());
+			Assert.AreEqual(TokenType.Float3, tokens[0].Type);
+			Assert.AreEqual(TokenType.Identifier, tokens[1].Type);
+			Assert.AreEqual("normal", ((IdentifierToken)tokens[1]).Identifier);
+			Assert.AreEqual(TokenType.Colon, tokens[2].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[3].Type);
+			Assert.AreEqual("NORMAL", ((StringToken)tokens[3]).Value);
+			Assert.AreEqual(TokenType.Semicolon, tokens[4].Type);
+			Assert.AreEqual(TokenType.Eof, tokens[5].Type);
+		}
+
+		[Test]
+		public void CanLexDeclarationWithInitialValue1()
+		{
+			// Arrange.
+			Lexer lexer = new Lexer(null, @"float3 normal = float3(0, 1, 0);");
+
+			// Act.
+			var tokens = lexer.GetTokens();
+
+			// Assert.
+			Assert.AreEqual(13, tokens.Count());
+			Assert.AreEqual(TokenType.Float3, tokens[0].Type);
+			Assert.AreEqual(TokenType.Identifier, tokens[1].Type);
+			Assert.AreEqual("normal", ((IdentifierToken)tokens[1]).Identifier);
+			Assert.AreEqual(TokenType.Equal, tokens[2].Type);
+			Assert.AreEqual(TokenType.Float3, tokens[3].Type);
+			Assert.AreEqual(TokenType.OpenParen, tokens[4].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[5].Type);
+			Assert.AreEqual(0, ((IntToken)tokens[5]).Value);
+			Assert.AreEqual(TokenType.Comma, tokens[6].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[7].Type);
+			Assert.AreEqual(1, ((IntToken)tokens[7]).Value);
+			Assert.AreEqual(TokenType.Comma, tokens[8].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[9].Type);
+			Assert.AreEqual(0, ((IntToken)tokens[9]).Value);
+			Assert.AreEqual(TokenType.CloseParen, tokens[10].Type);
+			Assert.AreEqual(TokenType.Semicolon, tokens[11].Type);
+			Assert.AreEqual(TokenType.Eof, tokens[12].Type);
+		}
+
+		[Test]
+		public void CanLexDeclarationWithInitialValue2()
+		{
+			// Arrange.
+			Lexer lexer = new Lexer(null, @"float3 normal = {0, -1f, 0.0f};");
+
+			// Act.
+			var tokens = lexer.GetTokens();
+
+			// Assert.
+			Assert.AreEqual(13, tokens.Count());
+			Assert.AreEqual(TokenType.Float3, tokens[0].Type);
+			Assert.AreEqual(TokenType.Identifier, tokens[1].Type);
+			Assert.AreEqual("normal", ((IdentifierToken)tokens[1]).Identifier);
+			Assert.AreEqual(TokenType.Equal, tokens[2].Type);
+			Assert.AreEqual(TokenType.OpenCurly, tokens[3].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[4].Type);
+			Assert.AreEqual(0, ((IntToken)tokens[4]).Value);
+			Assert.AreEqual(TokenType.Comma, tokens[5].Type);
+			Assert.AreEqual(TokenType.Minus, tokens[6].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[7].Type);
+			Assert.AreEqual(1f, ((FloatToken)tokens[7]).Value);
+			Assert.AreEqual(TokenType.Comma, tokens[8].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[9].Type);
+			Assert.AreEqual(0.0f, ((FloatToken)tokens[9]).Value);
+			Assert.AreEqual(TokenType.CloseCurly, tokens[10].Type);
+			Assert.AreEqual(TokenType.Semicolon, tokens[11].Type);
+			Assert.AreEqual(TokenType.Eof, tokens[12].Type);
+		}
+
+		[Test]
+		public void CanLexDeclarationWithSemanticAndInitialValue1()
+		{
+			// Arrange.
+			Lexer lexer = new Lexer(null, @"float3 normal : ""NORMAL"" = float3(0, 1, 0);");
+
+			// Act.
+			var tokens = lexer.GetTokens();
+
+			// Assert.
+			Assert.AreEqual(15, tokens.Count());
+			Assert.AreEqual(TokenType.Float3, tokens[0].Type);
+			Assert.AreEqual(TokenType.Identifier, tokens[1].Type);
+			Assert.AreEqual("normal", ((IdentifierToken)tokens[1]).Identifier);
+			Assert.AreEqual(TokenType.Colon, tokens[2].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[3].Type);
+			Assert.AreEqual("NORMAL", ((StringToken)tokens[3]).Value);
+			Assert.AreEqual(TokenType.Equal, tokens[4].Type);
+			Assert.AreEqual(TokenType.Float3, tokens[5].Type);
+			Assert.AreEqual(TokenType.OpenParen, tokens[6].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[7].Type);
+			Assert.AreEqual(0, ((IntToken)tokens[7]).Value);
+			Assert.AreEqual(TokenType.Comma, tokens[8].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[9].Type);
+			Assert.AreEqual(1, ((IntToken)tokens[9]).Value);
+			Assert.AreEqual(TokenType.Comma, tokens[10].Type);
+			Assert.AreEqual(TokenType.Literal, tokens[11].Type);
+			Assert.AreEqual(0, ((IntToken)tokens[11]).Value);
+			Assert.AreEqual(TokenType.CloseParen, tokens[12].Type);
 			Assert.AreEqual(TokenType.Semicolon, tokens[13].Type);
 			Assert.AreEqual(TokenType.Eof, tokens[14].Type);
 		}

@@ -33,7 +33,7 @@ namespace StitchUp.Content.Pipeline.Processors
 			StitchedEffectPreProcessor preProcessor = new StitchedEffectPreProcessor();
 			preProcessor.PreProcess(stitchedEffect);
 
-			// Find out which shader model to compile for.
+			// Find out which shader profile to compile for.
 			ShaderProfile shaderProfile = GetTargetShaderProfile(stitchedEffect);
 
 			// Generate effect code.

@@ -53,12 +53,18 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					return NewToken(TokenType.OpenCurly);
 				case '}':
 					return NewToken(TokenType.CloseCurly);
+				case '(':
+					return NewToken(TokenType.OpenParen);
+				case ')':
+					return NewToken(TokenType.CloseParen);
 				case '[':
 					return NewToken(TokenType.OpenSquare);
 				case ']':
 					return NewToken(TokenType.CloseSquare);
 				case '=':
 					return NewToken(TokenType.Equal);
+				case '-':
+					return NewToken(TokenType.Minus);
 				case ',':
 					return NewToken(TokenType.Comma);
 				case ':':
@@ -70,6 +76,55 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					string value = EatWhile(c2 => c2 != '"');
 					NextChar(); //Swallow the end of the string constant
 					return new StringToken(value, _path, TakePosition());
+				}
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+				{
+					// Fairly simple rules
+					// - If it contains a dot or ends with "f", then it's a float.
+					// If it contains an underscore, then it's a shader profile identifier (i.e. 2_0)
+					bool containsDot = false;
+					bool containsUnderscore = false;
+					_value.Length = 0;
+					_value.Append(c);
+					while (!IsEof && (PeekChar() == '.' || PeekChar() == '_' || char.IsDigit(PeekChar())))
+					{
+						char c2 = NextChar();
+						switch (c2)
+						{
+							case '.':
+								if (containsDot)
+								{
+									ReportError(Resources.LexerUnexpectedCharacter, c2);
+									return ErrorToken();
+								}
+								containsDot = true;
+								break;
+							case '_':
+								containsUnderscore = true;
+								break;
+						}
+						_value.Append(c2);
+					}
+					bool floatSuffix = false;
+					if (PeekChar() == 'f')
+					{
+						floatSuffix = true;
+						NextChar();
+					}
+					if (containsUnderscore)
+						return new IdentifierToken(_value.ToString(), _path, TakePosition());
+					if (containsDot || floatSuffix)
+						return new FloatToken(Convert.ToSingle(_value.ToString()), _path, TakePosition());
+					return new IntToken(Convert.ToInt32(_value.ToString()), _path, TakePosition());
 				}
 				default :
 					const string hlslDelimiter = "__hlsl__";

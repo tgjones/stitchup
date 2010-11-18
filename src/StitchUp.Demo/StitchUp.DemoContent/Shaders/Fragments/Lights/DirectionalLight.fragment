@@ -1,7 +1,7 @@
 ﻿fragment directional_light;
 
 [params]
-float3 direction : LIGHT_DIRECTION;
+float3 direction : LIGHT_DIRECTION = float3(1, -1, 0);
 float4 diffuse_color : LIGHT_DIFFUSE_COLOR;
 
 [headercode]
