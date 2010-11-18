@@ -98,7 +98,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			ShaderType shaderType = GetShaderType(blockName);
 
 			IdentifierToken version = (IdentifierToken) Eat(TokenType.Identifier);
-			ShaderModel shaderModel = GetShaderModel(version);
+			ShaderProfile shaderProfile = GetShaderProfile(version);
 
 			Eat(TokenType.CloseSquare);
 
@@ -107,7 +107,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			return new ShaderCodeBlockNode
 			{
 				ShaderType = shaderType,
-				ShaderModel = shaderModel,
+				ShaderProfile = shaderProfile,
 				Code = shaderCode.ShaderCode
 			};
 		}
@@ -125,16 +125,16 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			}
 		}
 
-		private ShaderModel GetShaderModel(IdentifierToken model)
+		private ShaderProfile GetShaderProfile(IdentifierToken model)
 		{
 			switch (model.Identifier)
 			{
 				case "2_0":
-					return ShaderModel.Version2_0;
+					return ShaderProfile.Version2_0;
 				case "3_0":
-					return ShaderModel.Version3_0;
+					return ShaderProfile.Version3_0;
 				default:
-					ReportError(Resources.ParserShaderModelNotSupported, model.Identifier);
+					ReportError(Resources.ParserShaderProfileNotSupported, model.Identifier);
 					throw new NotSupportedException();
 			}
 		}

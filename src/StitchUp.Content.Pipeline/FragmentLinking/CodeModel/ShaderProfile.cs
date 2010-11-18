@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 {
-	public enum ShaderModel
+	public enum ShaderProfile
 	{
 		// ReSharper disable InconsistentNaming
 		[Description("2_0")]

@@ -34,10 +34,10 @@ namespace StitchUp.Content.Pipeline.Processors
 			preProcessor.PreProcess(stitchedEffect);
 
 			// Find out which shader model to compile for.
-			ShaderModel shaderModel = GetTargetShaderModel(stitchedEffect);
+			ShaderProfile shaderProfile = GetTargetShaderProfile(stitchedEffect);
 
 			// Generate effect code.
-			EffectCodeGenerator codeGenerator = new EffectCodeGenerator(stitchedEffect, shaderModel);
+			EffectCodeGenerator codeGenerator = new EffectCodeGenerator(stitchedEffect, shaderProfile);
 			string effectCode = codeGenerator.GenerateCode();
 
 			// Save effect code so that if there are errors, we'll be able to view the generated .fx file.
@@ -62,12 +62,12 @@ namespace StitchUp.Content.Pipeline.Processors
 			return effectProcessor.Process(effectContent, context);
 		}
 
-		private static ShaderModel GetTargetShaderModel(StitchedEffectNode stitchedEffect)
+		private static ShaderProfile GetTargetShaderProfile(StitchedEffectNode stitchedEffect)
 		{
-			foreach (ShaderModel shaderModel in Enum.GetValues(typeof(ShaderModel)))
-				if (stitchedEffect.CanBeCompiledForShaderModel(shaderModel))
-					return shaderModel;
-			throw new InvalidContentException("Could not find shader model compatible with this stitched effect.");
+			foreach (ShaderProfile shaderProfile in Enum.GetValues(typeof(ShaderProfile)))
+				if (stitchedEffect.CanBeCompiledForShaderProfile(shaderProfile))
+					return shaderProfile;
+			throw new InvalidContentException("Could not find shader profile compatible with this stitched effect.");
 		}
 
 		private static IEnumerable<FragmentContent> LoadFragments(ContentProcessorContext context, IEnumerable<string> fragmentAssetNames)

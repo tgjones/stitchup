@@ -12,17 +12,17 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 			StitchedFragments = stitchedFragments;
 		}
 
-		public bool CanBeCompiledForShaderModel(ShaderModel shaderModel)
+		public bool CanBeCompiledForShaderProfile(ShaderProfile shaderProfile)
 		{
 			foreach (StitchedFragmentNode stitchedFragment in StitchedFragments)
 			{
 				// There might not be any vertex or pixel shaders, and that's OK, since we'll create them as needed.
 				// But if there IS a vertex or pixel shader, we should not automatically create one.
 				if (stitchedFragment.FragmentNode.VertexShaders.Any()
-					&& stitchedFragment.FragmentNode.VertexShaders.GetCodeBlock(shaderModel) == null)
+					&& stitchedFragment.FragmentNode.VertexShaders.GetCodeBlock(shaderProfile) == null)
 					return false;
 				if (stitchedFragment.FragmentNode.PixelShaders.Any()
-					&& stitchedFragment.FragmentNode.PixelShaders.GetCodeBlock(shaderModel) == null)
+					&& stitchedFragment.FragmentNode.PixelShaders.GetCodeBlock(shaderProfile) == null)
 					return false;
 			}
 			return true;

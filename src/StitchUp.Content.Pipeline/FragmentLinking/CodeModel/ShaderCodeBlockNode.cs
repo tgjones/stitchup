@@ -3,6 +3,6 @@
 	public class ShaderCodeBlockNode : CodeBlockNodeBase
 	{
 		public ShaderType ShaderType { get; set; }
-		public ShaderModel ShaderModel { get; set; }		
+		public ShaderProfile ShaderProfile { get; set; }		
 	}
 }

@@ -97,11 +97,11 @@ namespace StitchUp.Content.Pipeline.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Shader model &apos;{0}&apos; is not supported. Only 2_0 and 3_0 are supported..
+        ///   Looks up a localized string similar to Shader profile &apos;{0}&apos; is not supported. Only 2_0 and 3_0 are supported..
         /// </summary>
-        internal static string ParserShaderModelNotSupported {
+        internal static string ParserShaderProfileNotSupported {
             get {
-                return ResourceManager.GetString("ParserShaderModelNotSupported", resourceCulture);
+                return ResourceManager.GetString("ParserShaderProfileNotSupported", resourceCulture);
             }
         }
         

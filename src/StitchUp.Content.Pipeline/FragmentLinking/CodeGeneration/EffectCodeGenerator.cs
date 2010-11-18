@@ -12,13 +12,13 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 	public class EffectCodeGenerator
 	{
 		private readonly StitchedEffectNode _stitchedEffect;
-		private readonly ShaderModel _targetShaderModel;
+		private readonly ShaderProfile _targetShaderProfile;
 		private readonly StringBuilder _output;
 
-		public EffectCodeGenerator(StitchedEffectNode stitchedEffect, ShaderModel targetShaderModel)
+		public EffectCodeGenerator(StitchedEffectNode stitchedEffect, ShaderProfile targetShaderProfile)
 		{
 			_stitchedEffect = stitchedEffect;
-			_targetShaderModel = targetShaderModel;
+			_targetShaderProfile = targetShaderProfile;
 			_output = new StringBuilder();
 		}
 
@@ -72,7 +72,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 		{
 			_output.AppendLineFormat("// -------- vertex shader {0} --------", stitchedFragment.UniqueName);
 
-			ShaderCodeBlockNode shader = stitchedFragment.FragmentNode.VertexShaders.GetCodeBlock(_targetShaderModel);
+			ShaderCodeBlockNode shader = stitchedFragment.FragmentNode.VertexShaders.GetCodeBlock(_targetShaderProfile);
 
 			if (shader != null)
 			{
@@ -148,7 +148,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 			ForEachFragment(f =>
 			{
-				ShaderCodeBlockNode shader = f.FragmentNode.PixelShaders.GetCodeBlock(_targetShaderModel);
+				ShaderCodeBlockNode shader = f.FragmentNode.PixelShaders.GetCodeBlock(_targetShaderProfile);
 				if (shader != null)
 					_output.AppendLineFormat("\t{0}_ps(gPixelInput.{0}, output);", f.UniqueName);
 			});
@@ -160,7 +160,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 
 		private void WritePixelShader(StitchedFragmentNode stitchedFragment)
 		{
-			ShaderCodeBlockNode codeBlock = stitchedFragment.FragmentNode.PixelShaders.GetCodeBlock(_targetShaderModel);
+			ShaderCodeBlockNode codeBlock = stitchedFragment.FragmentNode.PixelShaders.GetCodeBlock(_targetShaderProfile);
 			if (codeBlock != null)
 			{
 				_output.AppendLineFormat("// -------- pixel shader {0} --------", stitchedFragment.UniqueName);
@@ -178,8 +178,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine("{");
 			_output.AppendLine("\tpass");
 			_output.AppendLine("\t{");
-			_output.AppendLineFormat("\t\tVertexShader = compile vs_{0} vs();", _targetShaderModel.GetDescription());
-			_output.AppendLineFormat("\t\tPixelShader = compile ps_{0} ps();", _targetShaderModel.GetDescription());
+			_output.AppendLineFormat("\t\tVertexShader = compile vs_{0} vs();", _targetShaderProfile.GetDescription());
+			_output.AppendLineFormat("\t\tPixelShader = compile ps_{0} ps();", _targetShaderProfile.GetDescription());
 			_output.AppendLine("\t}");
 			_output.AppendLine("};");
 		}

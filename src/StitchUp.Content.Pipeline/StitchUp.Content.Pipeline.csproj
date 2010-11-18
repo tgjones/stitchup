@@ -63,7 +63,7 @@
     <Compile Include="FragmentLinking\CodeModel\IdentifierToken.cs" />
     <Compile Include="FragmentLinking\CodeModel\ParameterBlockNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\ParseNode.cs" />
-    <Compile Include="FragmentLinking\CodeModel\ShaderModel.cs" />
+    <Compile Include="FragmentLinking\CodeModel\ShaderProfile.cs" />
     <Compile Include="FragmentLinking\CodeModel\ShaderType.cs" />
     <Compile Include="FragmentLinking\CodeModel\StitchedEffectNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\StitchedFragmentNode.cs" />

@@ -16,9 +16,9 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 			
 		}
 
-		public ShaderCodeBlockNode GetCodeBlock(ShaderModel targetShaderModel)
+		public ShaderCodeBlockNode GetCodeBlock(ShaderProfile targetShaderProfile)
 		{
-			return this.FirstOrDefault(n => n.ShaderModel <= targetShaderModel);
+			return this.FirstOrDefault(n => n.ShaderProfile <= targetShaderProfile);
 		}
 	}
 }
