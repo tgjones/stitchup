@@ -71,6 +71,19 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					return NewToken(TokenType.Colon);
 				case ';':
 					return NewToken(TokenType.Semicolon);
+				case '/':
+				{
+					char c2 = PeekChar();
+					if (c2 == '/')
+					{
+						while (!IsEof && !IsLineSeparator(PeekChar()))
+							NextChar();
+						TakePosition();
+						return NextToken();
+					}
+					ReportError(Resources.LexerUnexpectedCharacter, c);
+					return ErrorToken();
+				}
 				case '"':
 				{
 					string value = EatWhile(c2 => c2 != '"');

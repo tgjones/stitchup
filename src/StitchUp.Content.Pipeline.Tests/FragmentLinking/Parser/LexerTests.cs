@@ -228,5 +228,29 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 			Assert.AreEqual("void main(INPUT input, inout OUTPUT output)\r\t\t\t\t{\r\t\t\t\t}", ((ShaderCodeToken)tokens[4]).ShaderCode);
 			Assert.AreEqual(TokenType.Eof, tokens[5].Type);
 		}
+
+		[Test]
+		public void CanLexComment()
+		{
+			// Arrange.
+			Lexer lexer = new Lexer(null, @"[params] // this is a comment
+				// This is a commented line float3 = { }
+				[interpolators]");
+
+			// Act.
+			var tokens = lexer.GetTokens();
+
+			// Assert.
+			Assert.AreEqual(7, tokens.Count());
+			Assert.AreEqual(TokenType.OpenSquare, tokens[0].Type);
+			Assert.AreEqual(TokenType.Identifier, tokens[1].Type);
+			Assert.AreEqual("params", ((IdentifierToken)tokens[1]).Identifier);
+			Assert.AreEqual(TokenType.CloseSquare, tokens[2].Type);
+			Assert.AreEqual(TokenType.OpenSquare, tokens[3].Type);
+			Assert.AreEqual(TokenType.Identifier, tokens[4].Type);
+			Assert.AreEqual("interpolators", ((IdentifierToken)tokens[4]).Identifier);
+			Assert.AreEqual(TokenType.CloseSquare, tokens[5].Type);
+			Assert.AreEqual(TokenType.Eof, tokens[6].Type);
+		}
 	}
 }
