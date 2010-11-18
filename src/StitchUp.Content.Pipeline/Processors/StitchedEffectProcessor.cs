@@ -41,9 +41,9 @@ namespace StitchUp.Content.Pipeline.Processors
 			string effectCode = codeGenerator.GenerateCode();
 
 			// Save effect code so that if there are errors, we'll be able to view the generated .fx file.
-			context.Logger.LogImportantMessage(effectCode.Replace("{", "{{").Replace("}", "}}"));
 			string tempEffectFile = Path.Combine(Path.GetTempPath(), "StitchedEffect.fx");
 			File.WriteAllText(tempEffectFile, effectCode, Encoding.GetEncoding(1252));
+			context.Logger.LogImportantMessage(string.Format("{0} :	Stitched effect generated (double-click this message to view).", tempEffectFile));
 
 			// Process effect code.
 			EffectProcessor effectProcessor = new EffectProcessor
