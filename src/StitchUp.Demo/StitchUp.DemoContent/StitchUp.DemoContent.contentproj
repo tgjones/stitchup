@@ -79,11 +79,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Shaders\Fragments\BasicMaterial.fragment">
+    <None Include="Shaders\Fragments\BasicMaterial.fragment">
       <Name>BasicMaterial</Name>
-      <Importer>FragmentImporter</Importer>
+      <Importer>StitchedEffectImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
-    </Compile>
+    </None>
     <None Include="Shaders\BasicEffect.stitchedeffect">
       <Name>BasicEffect</Name>
       <Importer>StitchedEffectImporter</Importer>
@@ -91,34 +91,34 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Shaders\Fragments\VertexTypes\PositionNormalTexture.fragment">
+    <None Include="Shaders\Fragments\VertexTypes\PositionNormalTexture.fragment">
       <Name>PositionNormalTexture</Name>
-      <Importer>FragmentImporter</Importer>
-    </Compile>
+      <Importer>StitchedEffectImporter</Importer>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Shaders\Fragments\Lights\DirectionalLight.fragment">
+    <None Include="Shaders\Fragments\Lights\DirectionalLight.fragment">
       <Name>DirectionalLight</Name>
-      <Importer>FragmentImporter</Importer>
-    </Compile>
+      <Importer>StitchedEffectImporter</Importer>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Shaders\Fragments\LightingModels\Phong.fragment">
+    <None Include="Shaders\Fragments\LightingModels\Phong.fragment">
       <Name>Phong</Name>
-      <Importer>FragmentImporter</Importer>
-    </Compile>
+      <Importer>StitchedEffectImporter</Importer>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Shaders\Fragments\VertexTypes\VertexPassThru.fragment">
+    <None Include="Shaders\Fragments\VertexTypes\VertexPassThru.fragment">
       <Name>VertexPassThru</Name>
-      <Importer>FragmentImporter</Importer>
-    </Compile>
+      <Importer>StitchedEffectImporter</Importer>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Shaders\Fragments\PixelColorOutput.fragment">
+    <None Include="Shaders\Fragments\PixelColorOutput.fragment">
       <Name>PixelColorOutput</Name>
-      <Importer>FragmentImporter</Importer>
-    </Compile>
+      <Importer>StitchedEffectImporter</Importer>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 

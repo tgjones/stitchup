@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using StitchUp.Content.Pipeline.Graphics;
 
@@ -19,8 +20,11 @@ namespace StitchUp.Content.Pipeline
 				throw new FileNotFoundException("File not found", filename);
 
 			StitchedEffectContent content = new StitchedEffectContent();
-			content.Identity = new ContentIdentity(info.FullName, "Effect Importer");
-			content.Fragments.AddRange(File.ReadLines(filename));
+			content.Identity = new ContentIdentity(info.FullName, "Stitched Effect Importer");
+
+			content.Fragments.AddRange(File.ReadLines(filename).Select(l =>
+                new ExternalReference<FragmentContent>(l, content.Identity)));
+
 			return content;
 		}
 	}

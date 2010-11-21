@@ -5,11 +5,11 @@ namespace StitchUp.Content.Pipeline.Graphics
 {
 	public class StitchedEffectContent : ContentItem
 	{
-		public List<string> Fragments { get; private set; }
+		public List<ExternalReference<FragmentContent>> Fragments { get; private set; }
 
 		public StitchedEffectContent()
 		{
-			Fragments = new List<string>();
+		    Fragments = new List<ExternalReference<FragmentContent>>();
 		}
 	}
 }

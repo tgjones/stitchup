@@ -3,10 +3,4 @@ Content\ShipDiffuse.xnb
 Content\gameFont.xnb
 Content\Ground.xnb
 Content\Ship.xnb
-Content\Shaders\Fragments\BasicMaterial.xnb
-Content\Shaders\Fragments\VertexTypes\PositionNormalTexture.xnb
-Content\Shaders\Fragments\Lights\DirectionalLight.xnb
-Content\Shaders\Fragments\LightingModels\Phong.xnb
-Content\Shaders\Fragments\VertexTypes\VertexPassThru.xnb
-Content\Shaders\Fragments\PixelColorOutput.xnb
 Content\Shaders\BasicEffect_0.xnb

@@ -1,6 +1,6 @@
-﻿Shaders\Fragments\VertexTypes\PositionNormalTexture.fragment
-Shaders\Fragments\VertexTypes\VertexPassThru.fragment
-Shaders\Fragments\BasicMaterial.fragment
-Shaders\Fragments\Lights\DirectionalLight.fragment
-Shaders\Fragments\LightingModels\Phong.fragment
-Shaders\Fragments\PixelColorOutput.fragment
+﻿Fragments\VertexTypes\PositionNormalTexture.fragment
+Fragments\VertexTypes\VertexPassThru.fragment
+Fragments\BasicMaterial.fragment
+Fragments\Lights\DirectionalLight.fragment
+Fragments\LightingModels\Phong.fragment
+Fragments\PixelColorOutput.fragment

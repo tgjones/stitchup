@@ -19,7 +19,8 @@ namespace StitchUp.Content.Pipeline.Processors
 		public override CompiledEffectContent Process(StitchedEffectContent input, ContentProcessorContext context)
 		{
 			// Load fragments.
-			IEnumerable<FragmentContent> fragments = LoadFragments(context, input.Fragments);
+			IEnumerable<FragmentContent> fragments = input.Fragments.Select(f =>
+                context.BuildAndLoadAsset<FragmentContent, FragmentContent>(f, null));
 
 			// Load into intermediate objects which keep track of each fragment's unique name.
 			List<StitchedFragmentNode> stitchedFragments = fragments
@@ -101,18 +102,6 @@ namespace StitchUp.Content.Pipeline.Processors
 				if (stitchedEffect.CanBeCompiledForShaderProfile(shaderProfile))
 					return shaderProfile;
 			throw new InvalidContentException("Could not find shader profile compatible with this stitched effect.");
-		}
-
-		private static IEnumerable<FragmentContent> LoadFragments(ContentProcessorContext context, IEnumerable<string> fragmentAssetNames)
-		{
-			List<FragmentContent> result = new List<FragmentContent>();
-			foreach (string fragmentAssetName in fragmentAssetNames)
-			{
-				ExternalReference<FragmentContent> sourceFragment = new ExternalReference<FragmentContent>(fragmentAssetName);
-				FragmentContent shaderFragment = context.BuildAndLoadAsset<FragmentContent, FragmentContent>(sourceFragment, null);
-				result.Add(shaderFragment);
-			}
-			return result;
 		}
 	}
 }
