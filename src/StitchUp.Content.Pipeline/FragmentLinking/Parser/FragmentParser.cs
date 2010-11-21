@@ -97,10 +97,15 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 		{
 			ShaderType shaderType = GetShaderType(blockName);
 
-			IdentifierToken version = (IdentifierToken) Eat(TokenType.Identifier);
-			ShaderProfile shaderProfile = GetShaderProfile(version);
+            // Shader profile is optional.
+            ShaderProfile? shaderProfile = null;
+            if (PeekType() == TokenType.Identifier)
+            {
+                IdentifierToken version = (IdentifierToken) Eat(TokenType.Identifier);
+                shaderProfile = GetShaderProfile(version);
+            }
 
-			Eat(TokenType.CloseSquare);
+		    Eat(TokenType.CloseSquare);
 
 			ShaderCodeToken shaderCode = (ShaderCodeToken) Eat(TokenType.ShaderCode);
 

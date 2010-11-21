@@ -1,6 +1,6 @@
 ﻿fragment pixel_color_output;
 
-[ps 2_0]
+[ps]
 __hlsl__
 void main(INPUT input, inout OUTPUT output)
 {

@@ -7,7 +7,7 @@ float3 normal : NORMAL;
 [interpolators]
 float3 normal;
 
-[vs 2_0]
+[vs]
 __hlsl__
 void main(INPUT input, inout OUTPUT output)
 {
@@ -16,7 +16,7 @@ void main(INPUT input, inout OUTPUT output)
 }
 __hlsl__
 
-[ps 2_0]
+[ps]
 __hlsl__
 void main(INPUT input, inout OUTPUT output)
 {

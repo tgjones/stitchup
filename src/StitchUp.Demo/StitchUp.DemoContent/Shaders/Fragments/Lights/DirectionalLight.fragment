@@ -13,7 +13,7 @@ struct light
 };
 __hlsl__
 
-[ps 2_0]
+[ps]
 __hlsl__
 void main(INPUT input, inout OUTPUT output)
 {

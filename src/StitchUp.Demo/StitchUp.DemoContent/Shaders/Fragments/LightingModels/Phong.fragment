@@ -8,7 +8,7 @@ float4 ambient_light_diffuse_color : AMBIENT_LIGHT_DIFFUSE_COLOR;
 [interpolators]
 float3 world_position;
 
-[vs 2_0]
+[vs]
 __hlsl__
 void main(INPUT input, inout OUTPUT output)
 {
@@ -19,7 +19,7 @@ void main(INPUT input, inout OUTPUT output)
 }
 __hlsl__
 
-[ps 2_0]
+[ps]
 __hlsl__
 
 float4 process_light(light light, float3 cameraPosition,

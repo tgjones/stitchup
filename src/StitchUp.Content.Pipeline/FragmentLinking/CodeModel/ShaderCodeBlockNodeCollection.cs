@@ -18,7 +18,13 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 
 		public ShaderCodeBlockNode GetCodeBlock(ShaderProfile targetShaderProfile)
 		{
-			return this.FirstOrDefault(n => n.ShaderProfile <= targetShaderProfile);
+            // First attempt to get a shader matching this specific profile.
+            ShaderCodeBlockNode result = this.FirstOrDefault(n => n.ShaderProfile != null && n.ShaderProfile.Value <= targetShaderProfile);
+            if (result != null)
+                return result;
+
+            // Otherwise get the first shader with an unspecified profile.
+            return this.FirstOrDefault(n => n.ShaderProfile == null);
 		}
 	}
 }

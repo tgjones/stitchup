@@ -33,36 +33,69 @@ namespace StitchUp.Content.Pipeline.Processors
 			StitchedEffectPreProcessor preProcessor = new StitchedEffectPreProcessor();
 			preProcessor.PreProcess(stitchedEffect);
 
-			// Find out which shader profile to compile for.
-			ShaderProfile shaderProfile = GetTargetShaderProfile(stitchedEffect);
+			// Find out which shader profile to attempt to compile for first.
+            ShaderProfile minimumShaderProfile = GetMinimumTargetShaderProfile(stitchedEffect);
 
-			// Generate effect code.
-			EffectCodeGenerator codeGenerator = new EffectCodeGenerator(stitchedEffect, shaderProfile);
-			string effectCode = codeGenerator.GenerateCode();
+            foreach (ShaderProfile shaderProfile in Enum.GetValues(typeof(ShaderProfile)))
+            {
+                if (shaderProfile < minimumShaderProfile)
+                    continue;
 
-			// Save effect code so that if there are errors, we'll be able to view the generated .fx file.
-			string tempEffectFile = Path.Combine(Path.GetTempPath(), "StitchedEffect.fx");
-			File.WriteAllText(tempEffectFile, effectCode, Encoding.GetEncoding(1252));
-			context.Logger.LogImportantMessage(string.Format("{0} :	Stitched effect generated (double-click this message to view).", tempEffectFile));
+                CompiledEffectContent compiledEffect;
+                if (AttemptEffectCompilation(context, input, stitchedEffect, shaderProfile, out compiledEffect))
+                    return compiledEffect;
+            }
 
-			// Process effect code.
-			EffectProcessor effectProcessor = new EffectProcessor
-			{
-				DebugMode = EffectProcessorDebugMode.Auto,
-				Defines = null
-			};
-
-			EffectContent effectContent = new EffectContent
-			{
-				EffectCode = effectCode,
-				Identity = new ContentIdentity(tempEffectFile),
-				Name = input.Name
-			};
-
-			return effectProcessor.Process(effectContent, context);
+		    throw new InvalidContentException(
+                "Could not find a shader profile compatible with this stitched effect.",
+                input.Identity);
 		}
 
-		private static ShaderProfile GetTargetShaderProfile(StitchedEffectNode stitchedEffect)
+        private static bool AttemptEffectCompilation(
+            ContentProcessorContext context, StitchedEffectContent input,
+            StitchedEffectNode stitchedEffect, ShaderProfile shaderProfile,
+            out CompiledEffectContent compiledEffect)
+        {
+            // Generate effect code.
+            EffectCodeGenerator codeGenerator = new EffectCodeGenerator(stitchedEffect, shaderProfile);
+            string effectCode = codeGenerator.GenerateCode();
+
+            // Save effect code so that if there are errors, we'll be able to view the generated .fx file.
+            string tempEffectFile = Path.Combine(Path.GetTempPath(), "StitchedEffect.fx");
+            File.WriteAllText(tempEffectFile, effectCode, Encoding.GetEncoding(1252));
+            context.Logger.LogImportantMessage(string.Format("{0} :	Stitched effect generated (double-click this message to view).", tempEffectFile));
+
+            // Process effect code.
+            EffectProcessor effectProcessor = new EffectProcessor
+            {
+                DebugMode = EffectProcessorDebugMode.Auto,
+                Defines = null
+            };
+
+            EffectContent effectContent = new EffectContent
+            {
+                EffectCode = effectCode,
+                Identity = new ContentIdentity(tempEffectFile),
+                Name = input.Name
+            };
+
+            try
+            {
+                compiledEffect = effectProcessor.Process(effectContent, context);
+                return true;
+            }
+            catch (InvalidContentException ex)
+            {
+                if (ex.Message.Contains("error X5608") || ex.Message.Contains("error X5609"))
+                {
+                    compiledEffect = null;
+                    return false;
+                }
+                throw;
+            }
+        }
+
+		private static ShaderProfile GetMinimumTargetShaderProfile(StitchedEffectNode stitchedEffect)
 		{
 			foreach (ShaderProfile shaderProfile in Enum.GetValues(typeof(ShaderProfile)))
 				if (stitchedEffect.CanBeCompiledForShaderProfile(shaderProfile))
