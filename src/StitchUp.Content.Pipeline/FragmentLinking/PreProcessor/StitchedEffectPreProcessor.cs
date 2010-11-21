@@ -39,7 +39,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.PreProcessor
 
 		private static string ProcessExports(string processedCode, Dictionary<string, List<string>> exports, string uniqueFragmentName)
 		{
-			const string exportPattern = @"export\((?<TYPE>[\w]+), (?<NAME>[\w]+), (?<VALUE>[\s\S]+?)\);";
+			const string exportPattern = @"(?<WHITESPACE>[ \t]+)(?<EXPORT>export\((?<TYPE>[\w]+), (?<NAME>[\w]+), (?<VALUE>[\s\S]+?)\);)";
 			MatchCollection exportMatches = Regex.Matches(processedCode, exportPattern);
 			foreach (Match match in exportMatches)
 			{
@@ -59,7 +59,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.PreProcessor
 					exports[exportName].Add(variableName);
 				}
 			}
-			processedCode = Regex.Replace(processedCode, exportPattern, string.Format("// metafunction: $0\n\t{0}_export_${{NAME}} = ${{VALUE}};", uniqueFragmentName));
+			processedCode = Regex.Replace(processedCode, exportPattern,
+				string.Format("${{WHITESPACE}}// metafunction: ${{EXPORT}}\r${{WHITESPACE}}{0}_export_${{NAME}} = ${{VALUE}};", uniqueFragmentName));
 			return processedCode;
 		}
 

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.Xna.Framework.Content.Pipeline;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
-using StitchUp.Content.Pipeline.Graphics;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 {
@@ -174,6 +172,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 
 		private void WriteTechnique()
 		{
+			_output.AppendLine("// -------- technique --------");
 			_output.AppendLine("technique");
 			_output.AppendLine("{");
 			_output.AppendLine("\tpass");
@@ -204,6 +203,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLineFormat("// {0} header code", stitchedFragment.UniqueName);
 			_output.Append(stitchedFragment.FragmentNode.HeaderCode.Code);
 			_output.AppendLine();
+			_output.AppendLine();
 		}
 
 		private void WriteAllParams()
@@ -217,7 +217,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 				return;
 
 			_output.AppendLineFormat("// {0} params", stitchedFragment.UniqueName);
-			stitchedFragment.FragmentNode.Parameters.VariableDeclarations.ForEach(p => _output.AppendLine("\t" + GetVariableDeclaration(stitchedFragment, p)));
+			stitchedFragment.FragmentNode.Parameters.VariableDeclarations.ForEach(p => _output.AppendLine(GetVariableDeclaration(stitchedFragment, p)));
 			_output.AppendLine();
 		}
 
