@@ -198,6 +198,24 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			Token dataType = EatDataType();
 			IdentifierToken variableName = (IdentifierToken) Eat(TokenType.Identifier);
 
+			bool isArray = false;
+			int? arraySize = null;
+			if (PeekType() == TokenType.OpenSquare)
+			{
+				isArray = true;
+
+				Eat(TokenType.OpenSquare);
+				LiteralToken arraySizeToken = (LiteralToken) Eat(TokenType.Literal);
+				if (arraySizeToken.LiteralType != LiteralTokenType.Int || ((IntToken) arraySizeToken).Value < 1)
+				{
+					ReportError(Resources.ParserArrayIndexExpected);
+					throw new NotSupportedException();
+				}
+				arraySize = ((IntToken) arraySizeToken).Value;
+
+				Eat(TokenType.CloseSquare);
+			}
+
 			string semantic = null;
 			if (PeekType() == TokenType.Colon)
 			{
@@ -220,8 +238,10 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 
 			return new VariableDeclarationNode
 			{
-				Name = variableName.Identifier,
 				DataType = dataType.Type,
+				Name = variableName.Identifier,
+				IsArray = isArray,
+				ArraySize = arraySize,
 				Semantic = semantic,
 				InitialValue = initialValue
 			};

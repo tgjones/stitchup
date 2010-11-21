@@ -79,6 +79,15 @@ namespace StitchUp.Content.Pipeline.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected array index, which must be a positive integer &gt;= 1..
+        /// </summary>
+        internal static string ParserArrayIndexExpected {
+            get {
+                return ResourceManager.GetString("ParserArrayIndexExpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data type (bool, float, float2, float3, float4, floatNxM, matrix, Texture1D, Texture2D, Texture3D, TextureCube) expected..
         /// </summary>
         internal static string ParserDataTypeExpected {

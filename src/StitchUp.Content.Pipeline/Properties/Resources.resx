@@ -123,6 +123,9 @@
   <data name="LexerUnexpectedEndOfFileString" xml:space="preserve">
     <value>Unexpected end of file found. '"' expected.</value>
   </data>
+  <data name="ParserArrayIndexExpected" xml:space="preserve">
+    <value>Expected array index, which must be a positive integer &gt;= 1.</value>
+  </data>
   <data name="ParserDataTypeExpected" xml:space="preserve">
     <value>Data type (bool, float, float2, float3, float4, floatNxM, matrix, Texture1D, Texture2D, Texture3D, TextureCube) expected.</value>
   </data>
