@@ -10,7 +10,7 @@ float roughness : ROUGHNESS;
 bool diffuse_texture_enabled : DIFFUSE_TEXTURE_ENABLED;
 
 [textures]
-texture2D diffuse_texture;
+Texture2D diffuse_texture;
 
 [vertex]
 float2 uv;

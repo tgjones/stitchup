@@ -214,48 +214,16 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			return new VariableDeclarationNode
 			{
 				Name = variableName.Identifier,
-				DataType = GetDataType(dataType.Type),
+				DataType = dataType.Type,
 				Semantic = semantic,
 				InitialValue = initialValue
 			};
 		}
 
-		private static DataType GetDataType(TokenType type)
-		{
-			switch (type)
-			{
-				case TokenType.Bool :
-					return DataType.Bool;
-				case TokenType.Float:
-					return DataType.Float;
-				case TokenType.Float2:
-					return DataType.Float2;
-				case TokenType.Float3:
-					return DataType.Float3;
-				case TokenType.Float4:
-					return DataType.Float4;
-				case TokenType.Matrix:
-					return DataType.Matrix;
-				case TokenType.Texture2D:
-					return DataType.Texture2D;
-				default :
-					throw new NotSupportedException();
-			}
-		}
-
 		private Token EatDataType()
 		{
-			switch (PeekType())
-			{
-				case TokenType.Bool :
-				case TokenType.Float :
-				case TokenType.Float2 :
-				case TokenType.Float3 :
-				case TokenType.Float4 :
-				case TokenType.Matrix :
-				case TokenType.Texture2D:
-					return NextToken();
-			}
+            if (Token.IsDataType(PeekType()))
+				return NextToken();
 			ReportError(Resources.ParserDataTypeExpected, PeekToken());
 			return ErrorToken();
 		}

@@ -308,7 +308,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 						semantic = v.Semantic;
 					else
 						semantic = "TEXCOORD" + tempIndex++;
-					_output.AppendLineFormat("\t{0} {1} : {2};", DataTypeUtility.ToString(v.DataType), v.Name, semantic);
+					_output.AppendLineFormat("\t{0} {1} : {2};", Token.GetString(v.DataType), v.Name, semantic);
 				});
 			index = tempIndex;
 
@@ -320,7 +320,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 		{
 			string semantic = (!string.IsNullOrEmpty(variable.Semantic)) ? " : " + variable.Semantic : string.Empty;
 			string initialValue = (!string.IsNullOrEmpty(variable.InitialValue)) ? " = " + variable.InitialValue : string.Empty;
-			return string.Format("{0} {1}_{2}{3}{4};", DataTypeUtility.ToString(variable.DataType),
+            return string.Format("{0} {1}_{2}{3}{4};", Token.GetString(variable.DataType),
 				stitchedFragment.UniqueName, variable.Name, semantic, initialValue);
 		}
 

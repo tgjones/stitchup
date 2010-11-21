@@ -45,16 +45,16 @@ Global
 		{F77C2CD7-D01C-4214-88DE-1C8E8619A73F}.Release|Any CPU.ActiveCfg = Release|x86
 		{F77C2CD7-D01C-4214-88DE-1C8E8619A73F}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{F77C2CD7-D01C-4214-88DE-1C8E8619A73F}.Release|x86.ActiveCfg = Release|x86
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|x86.ActiveCfg = Release|Any CPU
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|x86.ActiveCfg = Debug|x86
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Debug|x86.Build.0 = Debug|x86
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|Any CPU.ActiveCfg = Release|x86
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|Mixed Platforms.Build.0 = Release|x86
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|x86.ActiveCfg = Release|x86
+		{E0BF3B98-EB95-4774-9191-8BE0E9A248D8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

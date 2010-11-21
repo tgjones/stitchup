@@ -7,7 +7,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		[Description("fragment")]
 		Fragment,
 
-		[Description("effect")]
+        [Description("effect")] // Everything after this and before "true" is a data type
 		Effect,
 
 		[Description("float")]
@@ -28,10 +28,19 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		[Description("bool")]
 		Bool,
 
-		[Description("texture2D")]
+        [Description("Texture1D")]
+        Texture1D,
+
+		[Description("Texture2D")]
 		Texture2D,
 
-		[Description("true")]
+        [Description("Texture3D")]
+        Texture3D,
+
+        [Description("TextureCube")]
+        TextureCube,
+
+        [Description("true")] // Everything before this and before "effect" is a data type
 		True,
 
 		[Description("false")]

@@ -62,7 +62,6 @@
     <Compile Include="FragmentLinking\CodeModel\ParameterBlockType.cs" />
     <Compile Include="FragmentLinking\CodeModel\ShaderCodeBlockNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\ShaderCodeToken.cs" />
-    <Compile Include="FragmentLinking\CodeModel\DataType.cs" />
     <Compile Include="FragmentLinking\CodeModel\FragmentNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\IdentifierToken.cs" />
     <Compile Include="FragmentLinking\CodeModel\ParameterBlockNode.cs" />
@@ -96,7 +95,6 @@
     <Compile Include="FragmentLinking\CodeGeneration\StringBuilderExtensionMethods.cs" />
     <Compile Include="Graphics\FragmentContent.cs" />
     <Compile Include="FragmentLinking\Parser\ParserException.cs" />
-    <Compile Include="FragmentLinking\CodeModel\DataTypeUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FragmentImporter.cs" />
   </ItemGroup>

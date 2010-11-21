@@ -25,6 +25,16 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 		{
 			TestTokenType("fragment", TokenType.Fragment);
 			TestTokenType("effect", TokenType.Effect);
+            TestTokenType("bool", TokenType.Bool);
+            TestTokenType("float", TokenType.Float);
+            TestTokenType("float2", TokenType.Float2);
+            TestTokenType("float3", TokenType.Float3);
+            TestTokenType("float4", TokenType.Float4);
+            TestTokenType("matrix", TokenType.Matrix);
+            TestTokenType("texture1D", TokenType.Texture1D);
+            TestTokenType("texture2D", TokenType.Texture2D);
+            TestTokenType("texture3D", TokenType.Texture3D);
+            TestTokenType("textureCube", TokenType.TextureCube);
 		}
 
 		[Test]

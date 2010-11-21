@@ -79,7 +79,7 @@ namespace StitchUp.Content.Pipeline.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Data type (bool, float, float2, float3, float4, matrix, texture2D) expected..
+        ///   Looks up a localized string similar to Data type (bool, float, float2, float3, float4, matrix, Texture1D, Texture2D, Texture3D, TextureCube) expected..
         /// </summary>
         internal static string ParserDataTypeExpected {
             get {

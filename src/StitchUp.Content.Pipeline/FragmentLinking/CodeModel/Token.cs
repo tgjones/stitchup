@@ -28,6 +28,11 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 			return GetString(Type);
 		}
 
+        public static bool IsDataType(TokenType type)
+        {
+            return type > TokenType.Effect && type < TokenType.True;
+        }
+
 		public static bool IsKeyword(TokenType type)
 		{
 			return (type < TokenType.Identifier);
