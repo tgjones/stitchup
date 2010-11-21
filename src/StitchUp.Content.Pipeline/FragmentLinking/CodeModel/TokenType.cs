@@ -25,6 +25,56 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		[Description("matrix")]
 		Matrix,
 
+        // ReSharper disable InconsistentNaming
+        [Description("float1x1")]
+        Float1x1,
+
+        [Description("float1x2")]
+        Float1x2,
+
+        [Description("float1x3")]
+        Float1x3,
+
+        [Description("float1x4")]
+        Float1x4,
+
+        [Description("float2x1")]
+        Float2x1,
+
+        [Description("float2x2")]
+        Float2x2,
+
+        [Description("float2x3")]
+        Float2x3,
+
+        [Description("float2x4")]
+        Float2x4,
+
+        [Description("float3x1")]
+        Float3x1,
+
+        [Description("float3x2")]
+        Float3x2,
+
+        [Description("float3x3")]
+        Float3x3,
+
+        [Description("float3x4")]
+        Float3x4,
+
+        [Description("float4x1")]
+        Float4x1,
+
+        [Description("float4x2")]
+        Float4x2,
+
+        [Description("float4x3")]
+        Float4x3,
+
+        [Description("float4x4")]
+        Float4x4,
+        // ReSharper restore InconsistentNaming
+
 		[Description("bool")]
 		Bool,
 
