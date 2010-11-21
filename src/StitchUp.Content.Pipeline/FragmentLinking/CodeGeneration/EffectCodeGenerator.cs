@@ -28,7 +28,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			WriteAllVertexInputStructures();
 			WriteAllPixelInputStructures();
 			WriteAllVertexOutputStructures();
-			WritePixelOutputStructure();
+			WriteAllPixelOutputStructures();
 			WriteAllVertexShaders();
 			WriteAllPixelShaders();
 			WriteTechnique();
@@ -36,14 +36,28 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			return _output.ToString();
 		}
 
-		private void WritePixelOutputStructure()
+		private void WriteAllPixelOutputStructures()
 		{
-			_output.AppendLineFormat("// -------- pixel output type --------");
+			_output.AppendLine("// -------- pixel output structures --------");
+
+			SemanticGenerator semanticGenerator = new SemanticGenerator("COLOR", 1);
+			ForEachFragment(f => WritePixelOutputStructure(f, semanticGenerator));
+
 			_output.AppendLine("struct PIXELOUTPUT");
 			_output.AppendLine("{");
-			_output.AppendLine("\tfloat4 color : COLOR0;");
+			_output.AppendLineFormat("\tfloat4 color : COLOR0;");
+			ForEachFragment(f =>
+			{
+				if (f.FragmentNode.PixelOutputs != null && f.FragmentNode.PixelOutputs.VariableDeclarations.Any())
+					_output.AppendLineFormat("\t{0}_PIXELOUTPUT {0};", f.UniqueName);
+			});
 			_output.AppendLine("};");
 			_output.AppendLine();
+		}
+
+		private void WritePixelOutputStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator)
+		{
+			WriteShaderInputStructure(stitchedFragment, semanticGenerator, "PIXELOUTPUT", stitchedFragment.FragmentNode.PixelOutputs, true);
 		}
 
 		private void WriteAllVertexShaders()
@@ -74,9 +88,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 
 			if (shader != null)
 			{
-				// Replace "passthrough(*normal*);" with code to pass vertex attribute with matching name through to interpolator.
-				string shaderCode = Regex.Replace(shader.Code, @"output\((?<NAME>[\w]+), (?<VALUE>[\s\S]+?)\);",
-					string.Format("output.{0}.${{NAME}} = ${{VALUE}};", stitchedFragment.UniqueName));
+				string shaderCode = ReplaceOutputCalls(shader.Code, stitchedFragment.UniqueName);
 				WriteShaderCode(stitchedFragment, shaderCode, "VERTEXINPUT", "VERTEXOUTPUT", "vs");
 			}
 			else
@@ -90,6 +102,14 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 
 			_output.AppendLine();
 			_output.AppendLine();
+		}
+
+		private static string ReplaceOutputCalls(string shaderCode, string uniqueName)
+		{
+			// Replace "output(*variable*);" with code to pass input value (i.e. vertex attribute)
+			// with matching name through to output value (i.e. interpolator).
+			return Regex.Replace(shaderCode, @"output\((?<NAME>[\w]+), (?<VALUE>[\s\S]+?)\);",
+				string.Format("output.{0}.${{NAME}} = ${{VALUE}};", uniqueName));
 		}
 
 		private static string GetVertexPassThroughCode(StitchedFragmentNode stitchedFragment)
@@ -163,7 +183,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			{
 				_output.AppendLineFormat("// -------- pixel shader {0} --------", stitchedFragment.UniqueName);
 
-				WriteShaderCode(stitchedFragment, codeBlock.Code, "PIXELINPUT", "PIXELOUTPUT", "ps");
+				string shaderCode = ReplaceOutputCalls(codeBlock.Code, stitchedFragment.UniqueName);
+				WriteShaderCode(stitchedFragment, shaderCode, "PIXELINPUT", "PIXELOUTPUT", "ps");
 
 				_output.AppendLine();
 				_output.AppendLine();
@@ -245,8 +266,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 		{
 			_output.AppendLine("// -------- vertex input structures --------");
 
-			int index = 0;
-			ForEachFragment(f => WriteVertexInputStructure(f, ref index));
+			SemanticGenerator semanticGenerator = new SemanticGenerator("TEXCOORD");
+			ForEachFragment(f => WriteVertexInputStructure(f, semanticGenerator));
 
 			_output.AppendLine("struct VERTEXINPUT");
 			_output.AppendLine("{");
@@ -277,9 +298,9 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 		private void WriteAllPixelInputStructures()
 		{
 			_output.AppendLine("// -------- pixel input structures --------");
-			int index = 0;
-			
-			ForEachFragment(f => WritePixelInputStructure(f, ref index));
+
+			SemanticGenerator semanticGenerator = new SemanticGenerator("TEXCOORD");
+			ForEachFragment(f => WritePixelInputStructure(f, semanticGenerator));
 
 			_output.AppendLine("struct PIXELINPUT");
 			_output.AppendLine("{");
@@ -290,34 +311,35 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 		}
 
-		private void WriteVertexInputStructure(StitchedFragmentNode stitchedFragment, ref int index)
+		private void WriteVertexInputStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator)
 		{
-			WriteShaderInputStructure(stitchedFragment, ref index, "VERTEXINPUT", stitchedFragment.FragmentNode.VertexAttributes, false);
+			WriteShaderInputStructure(stitchedFragment, semanticGenerator, "VERTEXINPUT", stitchedFragment.FragmentNode.VertexAttributes, false);
 		}
 
-		private void WritePixelInputStructure(StitchedFragmentNode stitchedFragment, ref int index)
+		private void WritePixelInputStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator)
 		{
-			WriteShaderInputStructure(stitchedFragment, ref index, "PIXELINPUT", stitchedFragment.FragmentNode.Interpolators, true);
+			WriteShaderInputStructure(stitchedFragment, semanticGenerator, "PIXELINPUT", stitchedFragment.FragmentNode.Interpolators, true);
 		}
 
-		private void WriteShaderInputStructure(StitchedFragmentNode stitchedFragment, ref int index, string structSuffix,
+		private void WriteShaderInputStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator, string structSuffix,
 			ParameterBlockNode parameterBlock, bool alwaysUseTexCoords)
+		{
+			WriteShaderStructure(stitchedFragment, semanticGenerator, structSuffix, parameterBlock);
+		}
+
+		private void WriteShaderStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator,
+			string structSuffix, ParameterBlockNode parameterBlock)
 		{
 			_output.AppendLineFormat("struct {0}_{1}", stitchedFragment.UniqueName, structSuffix);
 			_output.AppendLine("{");
 
-			int tempIndex = index;
 			if (parameterBlock != null)
 				parameterBlock.VariableDeclarations.ForEach(v =>
 				{
-					string semantic;
-					if (!alwaysUseTexCoords && !string.IsNullOrEmpty(v.Semantic))
-						semantic = v.Semantic;
-					else
-						semantic = "TEXCOORD" + tempIndex++;
-					_output.AppendLineFormat("\t{0} {1} : {2};", Token.GetString(v.DataType), v.Name, semantic);
+					string semantic = semanticGenerator.GetNextSemantic(v);
+					_output.AppendLineFormat("\t{0} {1} : {2};",
+						Token.GetString(v.DataType), v.Name, semantic);
 				});
-			index = tempIndex;
 
 			_output.AppendLine("};");
 			_output.AppendLine();

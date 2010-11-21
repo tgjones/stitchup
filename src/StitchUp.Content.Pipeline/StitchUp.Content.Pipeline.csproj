@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FragmentLinking\CodeGeneration\SemanticGenerator.cs" />
     <Compile Include="FragmentLinking\CodeModel\IntToken.cs" />
     <Compile Include="FragmentLinking\CodeModel\FloatToken.cs" />
     <Compile Include="FragmentLinking\CodeModel\LiteralToken.cs" />

@@ -1,5 +1,8 @@
 ﻿fragment pixel_color_output;
 
+[pixeloutputs]
+float4 extraOutput;
+
 [ps]
 __hlsl__
 void main(INPUT input, inout OUTPUT output)
@@ -8,5 +11,7 @@ void main(INPUT input, inout OUTPUT output)
 	float4 total_light_color = float4(0, 0, 0, 0);
 	import(light_color, total_light_color += light_color);
 	output.color = total_light_color;
+
+	output(extraOutput, float4(1, 0, 0, 1));
 }
 __hlsl__

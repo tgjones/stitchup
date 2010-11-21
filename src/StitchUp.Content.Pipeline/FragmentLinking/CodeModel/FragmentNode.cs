@@ -11,6 +11,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		public ParameterBlockNode Parameters { get; set; }
 		public ParameterBlockNode VertexAttributes { get; set; }
 		public ParameterBlockNode Textures { get; set; }
+		public ParameterBlockNode PixelOutputs { get; set; }
 
 		public HeaderCodeBlockNode HeaderCode { get; set; }
 

@@ -79,7 +79,7 @@ namespace StitchUp.Content.Pipeline.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Data type (bool, float, float2, float3, float4, matrix, Texture1D, Texture2D, Texture3D, TextureCube) expected..
+        ///   Looks up a localized string similar to Data type (bool, float, float2, float3, float4, floatNxM, matrix, Texture1D, Texture2D, Texture3D, TextureCube) expected..
         /// </summary>
         internal static string ParserDataTypeExpected {
             get {
@@ -97,7 +97,7 @@ namespace StitchUp.Content.Pipeline.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Block type (parameters, interpolators, vertexattributes, textures, vs, ps) expected, but found &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Block type (parameters, interpolators, vertexattributes, textures, vertexoutputs, vs, ps) expected, but found &apos;{0}&apos;..
         /// </summary>
         internal static string ParserParameterBlockTypeExpected {
             get {

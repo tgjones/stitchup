@@ -47,6 +47,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					blocks.OfType<ParameterBlockNode>().FirstOrDefault(b => b.Type == ParameterBlockType.VertexAttributes),
 				Textures = blocks.OfType<ParameterBlockNode>().FirstOrDefault(b => b.Type == ParameterBlockType.Textures),
 				HeaderCode = blocks.OfType<HeaderCodeBlockNode>().FirstOrDefault(),
+				PixelOutputs =
+					blocks.OfType<ParameterBlockNode>().FirstOrDefault(b => b.Type == ParameterBlockType.PixelOutputs),
 				VertexShaders =
 					new ShaderCodeBlockNodeCollection(blocks.OfType<ShaderCodeBlockNode>().Where(c => c.ShaderType == ShaderType.VertexShader)),
 				PixelShaders =
@@ -173,8 +175,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 				case "vertexattributes":
 				case "vertex":
 					return ParameterBlockType.VertexAttributes;
-				case "header":
-					return ParameterBlockType.Header;
+				case "pixeloutputs":
+					return ParameterBlockType.PixelOutputs;
 				default:
 					ReportError(Resources.ParserParameterBlockTypeExpected, blockName.Identifier);
 					throw new NotSupportedException();

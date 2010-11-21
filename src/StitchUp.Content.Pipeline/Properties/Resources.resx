@@ -124,13 +124,13 @@
     <value>Unexpected end of file found. '"' expected.</value>
   </data>
   <data name="ParserDataTypeExpected" xml:space="preserve">
-    <value>Data type (bool, float, float2, float3, float4, matrix, Texture1D, Texture2D, Texture3D, TextureCube) expected.</value>
+    <value>Data type (bool, float, float2, float3, float4, floatNxM, matrix, Texture1D, Texture2D, Texture3D, TextureCube) expected.</value>
   </data>
   <data name="ParserInitialValueUnexpected" xml:space="preserve">
     <value>Initial value was not expected for this type of parameter block.</value>
   </data>
   <data name="ParserParameterBlockTypeExpected" xml:space="preserve">
-    <value>Block type (parameters, interpolators, vertexattributes, textures, vs, ps) expected, but found '{0}'.</value>
+    <value>Block type (parameters, interpolators, vertexattributes, textures, vertexoutputs, vs, ps) expected, but found '{0}'.</value>
   </data>
   <data name="ParserShaderProfileNotSupported" xml:space="preserve">
     <value>Shader profile '{0}' is not supported. Only 2_0 and 3_0 are supported.</value>

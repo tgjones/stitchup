@@ -6,6 +6,6 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		VertexAttributes,
 		Interpolators,
 		Textures,
-		Header
+		PixelOutputs
 	}
 }
