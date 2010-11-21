@@ -262,5 +262,18 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 			Assert.AreEqual(TokenType.CloseSquare, tokens[5].Type);
 			Assert.AreEqual(TokenType.Eof, tokens[6].Type);
 		}
+
+        [Test]
+        public void BadlyFormattedCommentResultsInErrorToken()
+        {
+            // Arrange.
+            Lexer lexer = new Lexer(null, @"/ this is a bad comment");
+
+            // Act.
+            var tokens = lexer.GetTokens();
+
+            // Assert.
+            Assert.AreEqual(TokenType.Error, tokens[0].Type);
+        }
 	}
 }

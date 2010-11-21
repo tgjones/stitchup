@@ -186,7 +186,14 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 
 		private void WriteAllHeaderCode()
 		{
-			ForEachFragment(WriteHeaderCode);
+		    List<string> seenFragmentTypes = new List<string>();
+            foreach (StitchedFragmentNode stitchedFragmentNode in _stitchedEffect.StitchedFragments)
+            {
+                if (seenFragmentTypes.Contains(stitchedFragmentNode.FragmentNode.Name))
+                    continue;
+                WriteHeaderCode(stitchedFragmentNode);
+                seenFragmentTypes.Add(stitchedFragmentNode.FragmentNode.Name);
+            }
 		}
 
 		private void WriteHeaderCode(StitchedFragmentNode stitchedFragment)
