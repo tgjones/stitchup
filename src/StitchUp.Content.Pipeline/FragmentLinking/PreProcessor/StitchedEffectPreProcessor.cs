@@ -28,11 +28,11 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.PreProcessor
 		{
 			string processedCode = codeBlock.Code;
 
-			// Check program for exports.
-			processedCode = ProcessExports(processedCode, exports, uniqueFragmentName);
-
 			// Check program for imports.
 			processedCode = ProcessImports(processedCode, exports);
+
+			// Check program for exports.
+			processedCode = ProcessExports(processedCode, exports, uniqueFragmentName);
 
 			codeBlock.Code = processedCode;
 		}
