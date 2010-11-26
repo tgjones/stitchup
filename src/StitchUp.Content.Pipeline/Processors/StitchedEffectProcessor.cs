@@ -92,7 +92,7 @@ namespace StitchUp.Content.Pipeline.Processors
             }
             catch (InvalidContentException ex)
             {
-                if (ex.Message.Contains("error X5608") || ex.Message.Contains("error X5609"))
+                if (ErrorIndicatesNeedForShaderModel3(ex.Message))
                 {
                     compiledEffect = null;
                     return false;
@@ -100,6 +100,13 @@ namespace StitchUp.Content.Pipeline.Processors
                 throw;
             }
         }
+
+		private static bool ErrorIndicatesNeedForShaderModel3(string message)
+		{
+			return message.Contains("error X5608")
+				|| message.Contains("error X5609")
+				|| message.Contains("error X4502");
+		}
 
 		// Use a semi-unique filename so that multiple stitched effects can be worked on and the resulting
 		// effect files opened simultaneously. This does mean you'll end up with several of the resulting
