@@ -64,7 +64,6 @@ namespace StitchUp.Content.Pipeline.Processors
             // Save effect code so that if there are errors, we'll be able to view the generated .fx file.
             string tempEffectFile = GetTempEffectFileName(input);
             File.WriteAllText(tempEffectFile, effectCode, Encoding.GetEncoding(1252));
-            context.Logger.LogImportantMessage(string.Format("{0} :	Stitched effect generated (double-click this message to view).", tempEffectFile));
 
             // Process effect code.
             EffectProcessor effectProcessor = new EffectProcessor
@@ -83,6 +82,12 @@ namespace StitchUp.Content.Pipeline.Processors
             try
             {
                 compiledEffect = effectProcessor.Process(effectContent, context);
+
+				// This is only needed if the compilation was successful - if it failed,
+				// a more specific error message (with link to the generated file)
+				// will be shown to the user.
+				context.Logger.LogImportantMessage(string.Format("{0} : Stitched effect generated (double-click this message to view).", tempEffectFile));
+
                 return true;
             }
             catch (InvalidContentException ex)
