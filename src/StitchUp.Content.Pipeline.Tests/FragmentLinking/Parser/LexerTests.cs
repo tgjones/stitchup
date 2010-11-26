@@ -24,7 +24,7 @@ namespace StitchUp.Content.Pipeline.Tests.FragmentLinking.Parser
 		public void CanLexKeyword()
 		{
 			TestTokenType("fragment", TokenType.Fragment);
-			TestTokenType("effect", TokenType.Effect);
+			TestTokenType("stitchedeffect", TokenType.StitchedEffect);
             TestTokenType("bool", TokenType.Bool);
             TestTokenType("float", TokenType.Float);
             TestTokenType("float2", TokenType.Float2);

@@ -7,8 +7,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		[Description("fragment")]
 		Fragment,
 
-        [Description("effect")] // Everything after this and before "true" is a data type
-		Effect,
+        [Description("stitchedeffect")] // Everything after this and before "true" is a data type
+		StitchedEffect,
 
 		[Description("int")]
 		Int,

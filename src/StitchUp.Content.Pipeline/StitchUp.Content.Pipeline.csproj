@@ -81,6 +81,7 @@
     <Compile Include="FragmentLinking\Parser\ErrorEventHandler.cs" />
     <Compile Include="FragmentLinking\Parser\Lexer.cs" />
     <Compile Include="FragmentLinking\Parser\FragmentParser.cs" />
+    <Compile Include="FragmentLinking\Parser\Parser.cs" />
     <Compile Include="FragmentLinking\Parser\TextBuffer.cs" />
     <Compile Include="FragmentLinking\PreProcessor\StitchedEffectPreProcessor.cs" />
     <Compile Include="Graphics\StitchedEffectContent.cs" />
