@@ -62,7 +62,7 @@ namespace StitchUp.Content.Pipeline.Processors
             string effectCode = codeGenerator.GenerateCode();
 
             // Save effect code so that if there are errors, we'll be able to view the generated .fx file.
-            string tempEffectFile = Path.Combine(Path.GetTempPath(), "StitchedEffect.fx");
+            string tempEffectFile = GetTempEffectFileName(input);
             File.WriteAllText(tempEffectFile, effectCode, Encoding.GetEncoding(1252));
             context.Logger.LogImportantMessage(string.Format("{0} :	Stitched effect generated (double-click this message to view).", tempEffectFile));
 
@@ -95,6 +95,14 @@ namespace StitchUp.Content.Pipeline.Processors
                 throw;
             }
         }
+
+		// Use a semi-unique filename so that multiple stitched effects can be worked on and the resulting
+		// effect files opened simultaneously. This does mean you'll end up with several of the resulting
+		// effect files in your temp folder, but they're quite small files.
+		private static string GetTempEffectFileName(StitchedEffectContent input)
+		{
+			return Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetFileName(input.Identity.SourceFilename), ".fx"));
+		}
 
 		private static ShaderProfile GetMinimumTargetShaderProfile(StitchedEffectNode stitchedEffect)
 		{
