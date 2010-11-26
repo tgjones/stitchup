@@ -10,6 +10,18 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
         [Description("effect")] // Everything after this and before "true" is a data type
 		Effect,
 
+		[Description("int")]
+		Int,
+
+		[Description("int2")]
+		Int2,
+
+		[Description("int3")]
+		Int3,
+
+		[Description("int4")]
+		Int4,
+
 		[Description("float")]
 		Float,
 
@@ -26,6 +38,54 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		Matrix,
 
         // ReSharper disable InconsistentNaming
+		[Description("int1x1")]
+		Int1x1,
+
+		[Description("int1x2")]
+		Int1x2,
+
+		[Description("int1x3")]
+		Int1x3,
+
+		[Description("int1x4")]
+		Int1x4,
+
+		[Description("int2x1")]
+		Int2x1,
+
+		[Description("int2x2")]
+		Int2x2,
+
+		[Description("int2x3")]
+		Int2x3,
+
+		[Description("int2x4")]
+		Int2x4,
+
+		[Description("int3x1")]
+		Int3x1,
+
+		[Description("int3x2")]
+		Int3x2,
+
+		[Description("int3x3")]
+		Int3x3,
+
+		[Description("int3x4")]
+		Int3x4,
+
+		[Description("int4x1")]
+		Int4x1,
+
+		[Description("int4x2")]
+		Int4x2,
+
+		[Description("int4x3")]
+		Int4x3,
+
+		[Description("int4x4")]
+		Int4x4,
+
         [Description("float1x1")]
         Float1x1,
 
