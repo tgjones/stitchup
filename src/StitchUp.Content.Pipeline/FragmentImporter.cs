@@ -9,36 +9,25 @@ using ErrorEventArgs = StitchUp.Content.Pipeline.FragmentLinking.Parser.ErrorEve
 namespace StitchUp.Content.Pipeline
 {
 	[ContentImporter(".fragment", DisplayName = "Fragment Importer - StitchUp", DefaultProcessor = null)]
-	public class FragmentImporter : ContentImporter<FragmentContent>
+	public class FragmentImporter : ParsingImporter<FragmentContent, FragmentParser>
 	{
-		public override FragmentContent Import(string filename, ContentImporterContext context)
+		protected override string ImporterName
 		{
-			if (context == null)
-				throw new ArgumentNullException("context");
-			if (string.IsNullOrEmpty(filename))
-				throw new ArgumentException("Filename cannot be null or empty.", "filename");
-			FileInfo info = new FileInfo(filename);
-			if (!info.Exists)
-				throw new FileNotFoundException("File not found", filename);
-
-			Lexer lexer = new Lexer(filename, File.ReadAllText(filename));
-			lexer.Error += (sender, e) => ThrowParserException(e, info);
-			Token[] tokens = lexer.GetTokens();
-
-			FragmentParser parser = new FragmentParser(filename, tokens);
-			parser.Error += (sender, e) => ThrowParserException(e, info);
-			FragmentNode fragmentNode = parser.Parse();
-
-			FragmentContent content = new FragmentContent { FragmentNode = fragmentNode };
-			content.Identity = new ContentIdentity(info.FullName, "Fragment Importer");
-			return content;
+			get { return "Fragment Importer"; }
 		}
 
-		private static void ThrowParserException(ErrorEventArgs e, FileInfo info)
+		protected override FragmentParser GetParser(string fileName, Token[] tokens, ContentIdentity identity)
 		{
-			string identifier = string.Format("{0},{1}", e.Position.Line + 1, e.Position.Column + 1);
-			ContentIdentity contentIdentity = new ContentIdentity(info.FullName, "Fragment Importer", identifier);
-			throw new InvalidContentException(e.Message, contentIdentity);
+			return new FragmentParser(fileName, tokens);
+		}
+
+		protected override FragmentContent CreateContent(FragmentParser parser)
+		{
+			FragmentNode fragmentNode = parser.Parse();
+			return new FragmentContent
+			{
+				FragmentNode = fragmentNode
+			};
 		}
 	}
 }

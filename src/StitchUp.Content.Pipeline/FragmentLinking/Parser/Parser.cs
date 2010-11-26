@@ -47,19 +47,21 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			Eat(TokenType.OpenSquare);
 
 			IdentifierToken blockName = (IdentifierToken) Eat(TokenType.Identifier);
+			return GetBlockParseMethod(blockName)();
+		}
+
+		protected virtual Func<ParseNode> GetBlockParseMethod(IdentifierToken blockName)
+		{
 			switch (blockName.Identifier)
 			{
-				case "vs":
-				case "ps":
-					return ParseShaderCodeBlock(blockName);
-				case "headercode" :
-					return ParseHeaderCodeBlock();
+				case "headercode":
+					return () => ParseHeaderCodeBlock();
 				default:
-					return ParseParameterBlock(blockName);
+					return () => ParseParameterBlock(blockName);
 			}
 		}
 
-		private CodeBlockNodeBase ParseHeaderCodeBlock()
+		protected CodeBlockNodeBase ParseHeaderCodeBlock()
 		{
 			Eat(TokenType.CloseSquare);
 
@@ -71,7 +73,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			};
 		}
 
-		private CodeBlockNodeBase ParseShaderCodeBlock(IdentifierToken blockName)
+		protected CodeBlockNodeBase ParseShaderCodeBlock(IdentifierToken blockName)
 		{
 			ShaderType shaderType = GetShaderType(blockName);
 
@@ -122,14 +124,14 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			}
 		}
 
-		private ParameterBlockNode ParseParameterBlock(IdentifierToken blockName)
+		protected ParameterBlockNode ParseParameterBlock(IdentifierToken blockName)
 		{
 			Eat(TokenType.CloseSquare);
 
 			ParameterBlockType blockType = GetParameterBlockType(blockName);
 
 			bool allowInitialValue = (blockType == ParameterBlockType.Parameters);
-			List<VariableDeclarationNode> variableDeclarations = ParseVariableDeclarations(allowInitialValue);
+			List<VariableDeclarationNode> variableDeclarations = ParseVariableDeclarations(allowInitialValue, false, true, true, null);
 			return new ParameterBlockNode
 			{
 				Type = blockType,
@@ -137,46 +139,30 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			};
 		}
 
-		private ParameterBlockType GetParameterBlockType(IdentifierToken blockName)
-		{
-			switch (blockName.Identifier)
-			{
-				case "interpolators":
-					return ParameterBlockType.Interpolators;
-				case "parameters":
-				case "params":
-					return ParameterBlockType.Parameters;
-				case "textures":
-					return ParameterBlockType.Textures;
-				case "vertexattributes":
-				case "vertex":
-					return ParameterBlockType.VertexAttributes;
-				case "pixeloutputs":
-					return ParameterBlockType.PixelOutputs;
-				default:
-					ReportError(Resources.ParserParameterBlockTypeExpected, blockName.Identifier);
-					throw new NotSupportedException();
-			}
-		}
+		protected abstract ParameterBlockType GetParameterBlockType(IdentifierToken blockName);
 
-		private List<VariableDeclarationNode> ParseVariableDeclarations(bool allowInitialValue)
+		protected List<VariableDeclarationNode> ParseVariableDeclarations(bool allowInitialValue, bool requireInitialValue,
+			bool allowArray, bool allowSemantic,
+			TokenType? requiredDataType)
 		{
 			List<VariableDeclarationNode> result = new List<VariableDeclarationNode>();
 
 			while (PeekType() != TokenType.OpenSquare && PeekType() != TokenType.Eof)
-				result.Add(ParseVariableDeclaration(allowInitialValue));
+				result.Add(ParseVariableDeclaration(allowInitialValue, requireInitialValue, allowArray, allowSemantic, requiredDataType));
 
 			return result;
 		}
 
-		private VariableDeclarationNode ParseVariableDeclaration(bool allowInitialValue)
+		private VariableDeclarationNode ParseVariableDeclaration(bool allowInitialValue, bool requireInitialValue,
+			bool allowArray, bool allowSemantic,
+			TokenType? requiredDataType)
 		{
-			Token dataType = EatDataType();
+			Token dataType = (requiredDataType != null) ? Eat(requiredDataType.Value) : EatDataType();
 			IdentifierToken variableName = (IdentifierToken) Eat(TokenType.Identifier);
 
 			bool isArray = false;
 			Token arraySize = null;
-			if (PeekType() == TokenType.OpenSquare)
+			if (allowArray && PeekType() == TokenType.OpenSquare)
 			{
 				isArray = true;
 
@@ -204,14 +190,14 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			}
 
 			string semantic = null;
-			if (PeekType() == TokenType.Colon)
+			if (allowSemantic && PeekType() == TokenType.Colon)
 			{
 				Eat(TokenType.Colon);
 				semantic = ((IdentifierToken) Eat(TokenType.Identifier)).Identifier;
 			}
 
 			string initialValue = null;
-			if (PeekType() == TokenType.Equal)
+			if (requireInitialValue || PeekType() == TokenType.Equal)
 			{
 				if (!allowInitialValue)
 					ReportError(Resources.ParserInitialValueUnexpected);
@@ -242,7 +228,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			return ErrorToken();
 		}
 
-		private Token Eat(TokenType type)
+		protected Token Eat(TokenType type)
 		{
 			if (PeekType() == type)
 				return NextToken();
@@ -280,12 +266,12 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			ReportError(Resources.ParserTokenUnexpected, Token.GetString(type));
 		}
 
-		private void ReportError(string message, params object[] args)
+		protected void ReportError(string message, params object[] args)
 		{
 			ReportError(message, PeekToken(), args);
 		}
 
-		private void ReportError(string message, Token token, params object[] args)
+		protected void ReportError(string message, Token token, params object[] args)
 		{
 			BufferPosition position = token.Position;
 			if (Error != null && _lastErrorPosition != position)

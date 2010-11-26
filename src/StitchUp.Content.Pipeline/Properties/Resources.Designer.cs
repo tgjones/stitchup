@@ -61,6 +61,15 @@ namespace StitchUp.Content.Pipeline.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Block type (parameters, headercode, interpolators, vertexattributes, textures, vertexoutputs, vs, ps) expected, but found &apos;{0}&apos;..
+        /// </summary>
+        internal static string FragmentParserParameterBlockTypeExpected {
+            get {
+                return ResourceManager.GetString("FragmentParserParameterBlockTypeExpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unexpected character: &apos;{0}&apos;..
         /// </summary>
         internal static string LexerUnexpectedCharacter {
@@ -106,15 +115,6 @@ namespace StitchUp.Content.Pipeline.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Block type (parameters, headercode, interpolators, vertexattributes, textures, vertexoutputs, vs, ps) expected, but found &apos;{0}&apos;..
-        /// </summary>
-        internal static string ParserParameterBlockTypeExpected {
-            get {
-                return ResourceManager.GetString("ParserParameterBlockTypeExpected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Shader profile &apos;{0}&apos; is not supported. Only 2_0 and 3_0 are supported..
         /// </summary>
         internal static string ParserShaderProfileNotSupported {
@@ -138,6 +138,15 @@ namespace StitchUp.Content.Pipeline.Properties {
         internal static string ParserTokenUnexpected {
             get {
                 return ResourceManager.GetString("ParserTokenUnexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Block type (headercode, fragments, techniques) expected, but found &apos;{0}&apos;..
+        /// </summary>
+        internal static string StitchedEffectParserParameterBlockTypeExpected {
+            get {
+                return ResourceManager.GetString("StitchedEffectParserParameterBlockTypeExpected", resourceCulture);
             }
         }
     }

@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
+using StitchUp.Content.Pipeline.FragmentLinking.EffectModel;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 {
 	public class EffectCodeGenerator
 	{
-		private readonly StitchedEffectNode _stitchedEffect;
+		private readonly StitchedEffectSymbol _stitchedEffect;
 		private readonly ShaderProfile _targetShaderProfile;
 		private readonly StringBuilder _output;
 
-		public EffectCodeGenerator(StitchedEffectNode stitchedEffect, ShaderProfile targetShaderProfile)
+		public EffectCodeGenerator(StitchedEffectSymbol stitchedEffect, ShaderProfile targetShaderProfile)
 		{
 			_stitchedEffect = stitchedEffect;
 			_targetShaderProfile = targetShaderProfile;
@@ -55,7 +56,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 		}
 
-		private void WritePixelOutputStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator)
+		private void WritePixelOutputStructure(StitchedFragmentSymbol stitchedFragment, SemanticGenerator semanticGenerator)
 		{
 			WriteShaderInputStructure(stitchedFragment, semanticGenerator, "PIXELOUTPUT", stitchedFragment.FragmentNode.PixelOutputs, true);
 		}
@@ -80,7 +81,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 		}
 
-		private void WriteVertexShader(StitchedFragmentNode stitchedFragment)
+		private void WriteVertexShader(StitchedFragmentSymbol stitchedFragment)
 		{
 			_output.AppendLineFormat("// -------- vertex shader {0} --------", stitchedFragment.UniqueName);
 
@@ -112,7 +113,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 				string.Format("output.{0}.${{NAME}} = ${{VALUE}};", uniqueName));
 		}
 
-		private static string GetVertexPassThroughCode(StitchedFragmentNode stitchedFragment)
+		private static string GetVertexPassThroughCode(StitchedFragmentSymbol stitchedFragment)
 		{
 			StringBuilder sb = new StringBuilder();
 			if (stitchedFragment.FragmentNode.VertexAttributes != null)
@@ -121,12 +122,12 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			return sb.ToString();
 		}
 
-		private static string GetVertexPassThroughCode(StitchedFragmentNode stitchedFragment, VariableDeclarationNode variable)
+		private static string GetVertexPassThroughCode(StitchedFragmentSymbol stitchedFragment, VariableDeclarationNode variable)
 		{
 			return string.Format("\toutput.{0}.{1} = input.{1};", stitchedFragment.UniqueName, variable.Name);
 		}
 
-		private void WriteShaderCode(StitchedFragmentNode stitchedFragment, string shaderCode,
+		private void WriteShaderCode(StitchedFragmentSymbol stitchedFragment, string shaderCode,
 			string inputStructName, string outputStructName, string functionSuffix)
 		{
 			string mangledCode = shaderCode;
@@ -145,7 +146,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.Append(mangledCode.Replace("\r", Environment.NewLine));
 		}
 
-		private static string ReplaceVariableNames(StitchedFragmentNode stitchedFragment, ParameterBlockNode parameters, string mangledCode)
+		private static string ReplaceVariableNames(StitchedFragmentSymbol stitchedFragment, ParameterBlockNode parameters, string mangledCode)
 		{
 			if (parameters != null)
 				parameters.VariableDeclarations.ToList().ForEach(i =>
@@ -176,7 +177,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 		}
 
-		private void WritePixelShader(StitchedFragmentNode stitchedFragment)
+		private void WritePixelShader(StitchedFragmentSymbol stitchedFragment)
 		{
 			ShaderCodeBlockNode codeBlock = stitchedFragment.FragmentNode.PixelShaders.GetCodeBlock(_targetShaderProfile);
 			if (codeBlock != null)
@@ -207,7 +208,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 		private void WriteAllHeaderCode()
 		{
 		    List<string> seenFragmentTypes = new List<string>();
-            foreach (StitchedFragmentNode stitchedFragmentNode in _stitchedEffect.StitchedFragments)
+            foreach (StitchedFragmentSymbol stitchedFragmentNode in _stitchedEffect.StitchedFragments)
             {
                 if (seenFragmentTypes.Contains(stitchedFragmentNode.FragmentNode.Name))
                     continue;
@@ -216,7 +217,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
             }
 		}
 
-		private void WriteHeaderCode(StitchedFragmentNode stitchedFragment)
+		private void WriteHeaderCode(StitchedFragmentSymbol stitchedFragment)
 		{
 			if (stitchedFragment.FragmentNode.HeaderCode == null || string.IsNullOrEmpty(stitchedFragment.FragmentNode.HeaderCode.Code))
 				return;
@@ -232,7 +233,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			ForEachFragment(WriteParams);
 		}
 
-		private void WriteParams(StitchedFragmentNode stitchedFragment)
+		private void WriteParams(StitchedFragmentSymbol stitchedFragment)
 		{
 			if (stitchedFragment.FragmentNode.Parameters == null || !stitchedFragment.FragmentNode.Parameters.VariableDeclarations.Any())
 				return;
@@ -247,7 +248,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			ForEachFragment(WriteSamplers);
 		}
 
-		private void WriteSamplers(StitchedFragmentNode stitchedFragment)
+		private void WriteSamplers(StitchedFragmentSymbol stitchedFragment)
 		{
 			if (stitchedFragment.FragmentNode.Textures == null || !stitchedFragment.FragmentNode.Textures.VariableDeclarations.Any())
 				return;
@@ -311,23 +312,23 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 		}
 
-		private void WriteVertexInputStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator)
+		private void WriteVertexInputStructure(StitchedFragmentSymbol stitchedFragment, SemanticGenerator semanticGenerator)
 		{
 			WriteShaderInputStructure(stitchedFragment, semanticGenerator, "VERTEXINPUT", stitchedFragment.FragmentNode.VertexAttributes, false);
 		}
 
-		private void WritePixelInputStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator)
+		private void WritePixelInputStructure(StitchedFragmentSymbol stitchedFragment, SemanticGenerator semanticGenerator)
 		{
 			WriteShaderInputStructure(stitchedFragment, semanticGenerator, "PIXELINPUT", stitchedFragment.FragmentNode.Interpolators, true);
 		}
 
-		private void WriteShaderInputStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator, string structSuffix,
+		private void WriteShaderInputStructure(StitchedFragmentSymbol stitchedFragment, SemanticGenerator semanticGenerator, string structSuffix,
 			ParameterBlockNode parameterBlock, bool alwaysUseTexCoords)
 		{
 			WriteShaderStructure(stitchedFragment, semanticGenerator, structSuffix, parameterBlock);
 		}
 
-		private void WriteShaderStructure(StitchedFragmentNode stitchedFragment, SemanticGenerator semanticGenerator,
+		private void WriteShaderStructure(StitchedFragmentSymbol stitchedFragment, SemanticGenerator semanticGenerator,
 			string structSuffix, ParameterBlockNode parameterBlock)
 		{
 			_output.AppendLineFormat("struct {0}_{1}", stitchedFragment.UniqueName, structSuffix);
@@ -345,7 +346,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 			_output.AppendLine();
 		}
 
-		private static string GetVariableDeclaration(StitchedFragmentNode stitchedFragment, VariableDeclarationNode variable)
+		private static string GetVariableDeclaration(StitchedFragmentSymbol stitchedFragment, VariableDeclarationNode variable)
 		{
 			string arrayStuff = (variable.IsArray && variable.ArraySize != null) ? "[" + variable.ArraySize + "]" : string.Empty;
 			string semantic = (!string.IsNullOrEmpty(variable.Semantic)) ? " : " + variable.Semantic : string.Empty;
@@ -356,9 +357,9 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
 				variable.Name, arrayStuff, semantic, initialValue);
 		}
 
-		private void ForEachFragment(Action<StitchedFragmentNode> action)
+		private void ForEachFragment(Action<StitchedFragmentSymbol> action)
 		{
-			foreach (StitchedFragmentNode stitchedFragmentNode in _stitchedEffect.StitchedFragments)
+			foreach (StitchedFragmentSymbol stitchedFragmentNode in _stitchedEffect.StitchedFragments)
 				action(stitchedFragmentNode);
 		}
 	}

@@ -1,6 +1,18 @@
-﻿Fragments\VertexTypes\PositionNormalTexture.fragment
-Fragments\VertexTypes\VertexPassThru.fragment
-Fragments\BasicMaterial.fragment
-Fragments\Lights\DirectionalLight.fragment
-Fragments\LightingModels\Phong.fragment
-Fragments\PixelColorOutput.fragment
+﻿stitchedeffect basic_effect;
+
+[fragments]
+fragment pnt = "Fragments\VertexTypes\PositionNormalTexture.fragment";
+fragment vpt = "Fragments\VertexTypes\VertexPassThru.fragment";
+fragment bm = "Fragments\BasicMaterial.fragment";
+fragment dl = "Fragments\Lights\DirectionalLight.fragment";
+fragment ph = "Fragments\LightingModels\Phong.fragment";
+fragment pco = "Fragments\PixelColorOutput.fragment";
+
+[techniques]
+technique t1
+{
+	pass p0
+	{
+		fragments = [pnt, vpt, bm, dl, ph, pco];
+	}
+}

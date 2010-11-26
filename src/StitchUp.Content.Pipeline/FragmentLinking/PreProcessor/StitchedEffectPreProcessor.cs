@@ -1,21 +1,21 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
-using StitchUp.Content.Pipeline.Graphics;
+using StitchUp.Content.Pipeline.FragmentLinking.EffectModel;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.PreProcessor
 {
 	public class StitchedEffectPreProcessor
 	{
-		public void PreProcess(StitchedEffectNode stitchedEffect)
+		public void PreProcess(StitchedEffectSymbol stitchedEffect)
 		{
 			// Replace all calls to export(...) and import(...)
 			// with expanded versions.
 			Dictionary<string, List<string>> exports = new Dictionary<string, List<string>>();
-			foreach (StitchedFragmentNode stitchedFragment in stitchedEffect.StitchedFragments)
+			foreach (StitchedFragmentSymbol stitchedFragment in stitchedEffect.StitchedFragments)
 			{
 				foreach (ShaderCodeBlockNode codeBlock in stitchedFragment.FragmentNode.VertexShaders)
 					PreProcessCodeBlock(stitchedFragment.UniqueName, codeBlock, exports);

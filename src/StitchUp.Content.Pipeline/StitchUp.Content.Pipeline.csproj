@@ -52,6 +52,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FragmentLinking\CodeGeneration\SemanticGenerator.cs" />
+    <Compile Include="FragmentLinking\CodeModel\TechniqueBlockNode.cs" />
+    <Compile Include="FragmentLinking\CodeModel\FragmentBlockNode.cs" />
+    <Compile Include="FragmentLinking\Compiler\StitchedEffectBuilder.cs" />
+    <Compile Include="FragmentLinking\EffectModel\TechniqueSymbol.cs" />
+    <Compile Include="FragmentLinking\EffectModel\TechniquePassSymbol.cs" />
+    <Compile Include="FragmentLinking\CodeModel\TechniqueNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\IntToken.cs" />
     <Compile Include="FragmentLinking\CodeModel\FloatToken.cs" />
     <Compile Include="FragmentLinking\CodeModel\LiteralToken.cs" />
@@ -69,9 +75,12 @@
     <Compile Include="FragmentLinking\CodeModel\ParseNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\ShaderProfile.cs" />
     <Compile Include="FragmentLinking\CodeModel\ShaderType.cs" />
+    <Compile Include="FragmentLinking\EffectModel\StitchedEffectSymbol.cs" />
     <Compile Include="FragmentLinking\CodeModel\StitchedEffectNode.cs" />
-    <Compile Include="FragmentLinking\CodeModel\StitchedFragmentNode.cs" />
+    <Compile Include="FragmentLinking\EffectModel\StitchedFragmentSymbol.cs" />
+    <Compile Include="FragmentLinking\CodeModel\TechniquePassNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\VariableDeclarationNode.cs" />
+    <Compile Include="FragmentLinking\Parser\StitchedEffectParser.cs" />
     <Compile Include="FragmentLinking\Parser\Keywords.cs" />
     <Compile Include="FragmentLinking\CodeModel\StringToken.cs" />
     <Compile Include="FragmentLinking\CodeModel\Token.cs" />
@@ -85,6 +94,7 @@
     <Compile Include="FragmentLinking\Parser\TextBuffer.cs" />
     <Compile Include="FragmentLinking\PreProcessor\StitchedEffectPreProcessor.cs" />
     <Compile Include="Graphics\StitchedEffectContent.cs" />
+    <Compile Include="ParsingImporter.cs" />
     <Compile Include="Processors\StitchedEffectModelProcessor.cs" />
     <Compile Include="Processors\StitchedEffectProcessor.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -106,6 +116,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.ContentPipelineExtensions.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

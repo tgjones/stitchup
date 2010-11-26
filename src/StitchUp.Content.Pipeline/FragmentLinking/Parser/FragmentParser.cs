@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
+using StitchUp.Content.Pipeline.Properties;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 {
@@ -41,6 +43,40 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 				PixelShaders =
 					new ShaderCodeBlockNodeCollection(blocks.OfType<ShaderCodeBlockNode>().Where(c => c.ShaderType == ShaderType.PixelShader))
 			};
+		}
+
+		protected override Func<ParseNode> GetBlockParseMethod(IdentifierToken blockName)
+		{
+			switch (blockName.Identifier)
+			{
+				case "vs":
+				case "ps":
+					return () => ParseShaderCodeBlock(blockName);
+				default:
+					return base.GetBlockParseMethod(blockName);
+			}
+		}
+
+		protected override ParameterBlockType GetParameterBlockType(IdentifierToken blockName)
+		{
+			switch (blockName.Identifier)
+			{
+				case "interpolators":
+					return ParameterBlockType.Interpolators;
+				case "parameters":
+				case "params":
+					return ParameterBlockType.Parameters;
+				case "textures":
+					return ParameterBlockType.Textures;
+				case "vertexattributes":
+				case "vertex":
+					return ParameterBlockType.VertexAttributes;
+				case "pixeloutputs":
+					return ParameterBlockType.PixelOutputs;
+				default:
+					ReportError(Resources.FragmentParserParameterBlockTypeExpected, blockName.Identifier);
+					throw new NotSupportedException();
+			}
 		}
 	}
 }

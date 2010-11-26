@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="FragmentParserParameterBlockTypeExpected" xml:space="preserve">
+    <value>Block type (parameters, headercode, interpolators, vertexattributes, textures, vertexoutputs, vs, ps) expected, but found '{0}'.</value>
+  </data>
   <data name="LexerUnexpectedCharacter" xml:space="preserve">
     <value>Unexpected character: '{0}'.</value>
   </data>
@@ -132,9 +135,6 @@
   <data name="ParserInitialValueUnexpected" xml:space="preserve">
     <value>Initial value was not expected for this type of parameter block.</value>
   </data>
-  <data name="ParserParameterBlockTypeExpected" xml:space="preserve">
-    <value>Block type (parameters, headercode, interpolators, vertexattributes, textures, vertexoutputs, vs, ps) expected, but found '{0}'.</value>
-  </data>
   <data name="ParserShaderProfileNotSupported" xml:space="preserve">
     <value>Shader profile '{0}' is not supported. Only 2_0 and 3_0 are supported.</value>
   </data>
@@ -143,5 +143,8 @@
   </data>
   <data name="ParserTokenUnexpected" xml:space="preserve">
     <value>Syntax error: '{0}' unexpected.</value>
+  </data>
+  <data name="StitchedEffectParserParameterBlockTypeExpected" xml:space="preserve">
+    <value>Block type (headercode, fragments, techniques) expected, but found '{0}'.</value>
   </data>
 </root>

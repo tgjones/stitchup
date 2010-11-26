@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
+using StitchUp.Content.Pipeline.FragmentLinking.Compiler;
+using StitchUp.Content.Pipeline.FragmentLinking.EffectModel;
 using StitchUp.Content.Pipeline.FragmentLinking.PreProcessor;
 using StitchUp.Content.Pipeline.Graphics;
 
@@ -18,17 +20,7 @@ namespace StitchUp.Content.Pipeline.Processors
 	{
 		public override CompiledEffectContent Process(StitchedEffectContent input, ContentProcessorContext context)
 		{
-			// Load fragments.
-			IEnumerable<FragmentContent> fragments = input.Fragments.Select(f =>
-                context.BuildAndLoadAsset<FragmentContent, FragmentContent>(f, null));
-
-			// Load into intermediate objects which keep track of each fragment's unique name.
-			List<StitchedFragmentNode> stitchedFragments = fragments
-				.Select((f, i) => new StitchedFragmentNode(f.FragmentNode.Name + i, f.FragmentNode))
-				.ToList();
-
-			// Load into intermediate object, which keeps track of each 
-			StitchedEffectNode stitchedEffect = new StitchedEffectNode(stitchedFragments);
+			StitchedEffectSymbol stitchedEffect = StitchedEffectBuilder.BuildStitchedEffect(input, context);
 
 			// Pre-process stitched effect - this replaces the export / import calls with their expansions.
 			StitchedEffectPreProcessor preProcessor = new StitchedEffectPreProcessor();
@@ -54,7 +46,7 @@ namespace StitchUp.Content.Pipeline.Processors
 
         private static bool AttemptEffectCompilation(
             ContentProcessorContext context, StitchedEffectContent input,
-            StitchedEffectNode stitchedEffect, ShaderProfile shaderProfile,
+            StitchedEffectSymbol stitchedEffect, ShaderProfile shaderProfile,
             out CompiledEffectContent compiledEffect)
         {
             // Generate effect code.
@@ -116,7 +108,7 @@ namespace StitchUp.Content.Pipeline.Processors
 			return Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetFileName(input.Identity.SourceFilename), ".fx"));
 		}
 
-		private static ShaderProfile GetMinimumTargetShaderProfile(StitchedEffectNode stitchedEffect)
+		private static ShaderProfile GetMinimumTargetShaderProfile(StitchedEffectSymbol stitchedEffect)
 		{
 			foreach (ShaderProfile shaderProfile in Enum.GetValues(typeof(ShaderProfile)))
 				if (stitchedEffect.CanBeCompiledForShaderProfile(shaderProfile))
