@@ -199,19 +199,30 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			IdentifierToken variableName = (IdentifierToken) Eat(TokenType.Identifier);
 
 			bool isArray = false;
-			int? arraySize = null;
+			Token arraySize = null;
 			if (PeekType() == TokenType.OpenSquare)
 			{
 				isArray = true;
 
 				Eat(TokenType.OpenSquare);
-				LiteralToken arraySizeToken = (LiteralToken) Eat(TokenType.Literal);
-				if (arraySizeToken.LiteralType != LiteralTokenType.Int || ((IntToken) arraySizeToken).Value < 1)
+				switch (PeekType())
 				{
-					ReportError(Resources.ParserArrayIndexExpected);
-					throw new NotSupportedException();
+					case TokenType.Literal:
+						LiteralToken arraySizeToken = (LiteralToken) Eat(TokenType.Literal);
+						if (arraySizeToken.LiteralType != LiteralTokenType.Int || ((IntToken) arraySizeToken).Value < 1)
+						{
+							ReportError(Resources.ParserArrayIndexExpected);
+							throw new NotSupportedException();
+						}
+						arraySize = arraySizeToken;
+						break;
+					case TokenType.Identifier:
+						arraySize = Eat(TokenType.Identifier);
+						break;
+					default:
+						ReportError(Resources.ParserArrayIndexExpected);
+						throw new NotSupportedException();
 				}
-				arraySize = ((IntToken) arraySizeToken).Value;
 
 				Eat(TokenType.CloseSquare);
 			}

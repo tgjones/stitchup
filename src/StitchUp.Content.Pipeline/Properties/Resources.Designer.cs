@@ -79,7 +79,7 @@ namespace StitchUp.Content.Pipeline.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected array index, which must be a positive integer &gt;= 1..
+        ///   Looks up a localized string similar to Expected array index, which must be either a positive integer &gt;= 1, or an identifier..
         /// </summary>
         internal static string ParserArrayIndexExpected {
             get {
