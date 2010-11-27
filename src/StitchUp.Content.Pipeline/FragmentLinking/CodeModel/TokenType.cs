@@ -156,6 +156,12 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		[Description("false")]
 		False,
 
+		[Description("technique")]
+		Technique,
+
+		[Description("pass")]
+		Pass,
+
 		[Description("Identifier")] // Everything before this is a keyword.
 		Identifier,
 

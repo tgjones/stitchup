@@ -147,4 +147,7 @@
   <data name="StitchedEffectParserParameterBlockTypeExpected" xml:space="preserve">
     <value>Block type (headercode, fragments, techniques) expected, but found '{0}'.</value>
   </data>
+  <data name="StitchedEffectParserStringLiteralOrIdentifierExpected" xml:space="preserve">
+    <value>String literal or identifier expected.</value>
+  </data>
 </root>

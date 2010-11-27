@@ -25,16 +25,26 @@ namespace StitchUp.Content.Pipeline
 
 			ContentIdentity identity = new ContentIdentity(info.FullName, ImporterName);
 
-			Lexer lexer = new Lexer(filename, File.ReadAllText(filename));
-			lexer.Error += (sender, e) => ThrowParserException(e, info);
-			Token[] tokens = lexer.GetTokens();
+			string text = File.ReadAllText(filename);
+			T content = BeginParse(filename, text, identity);
+			if (content == null)
+			{
+				Lexer lexer = new Lexer(filename, text);
+				lexer.Error += (sender, e) => ThrowParserException(e, info);
+				Token[] tokens = lexer.GetTokens();
 
-			TParser parser = GetParser(filename, tokens, identity);
-			parser.Error += (sender, e) => ThrowParserException(e, info);
+				TParser parser = GetParser(filename, tokens, identity);
+				parser.Error += (sender, e) => ThrowParserException(e, info);
 
-			T content = CreateContent(parser);
+				content = CreateContent(parser);
+			}
 			content.Identity = identity;
 			return content;
+		}
+
+		protected virtual T BeginParse(string fileName, string text, ContentIdentity identity)
+		{
+			return null;
 		}
 
 		protected abstract TParser GetParser(string fileName, Token[] tokens, ContentIdentity identity);

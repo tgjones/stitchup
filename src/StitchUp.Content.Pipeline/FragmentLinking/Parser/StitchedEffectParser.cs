@@ -55,9 +55,92 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 
 		private ParseNode ParseTechniqueBlock()
 		{
+			Eat(TokenType.CloseSquare);
+
+			List<TechniqueNode> techniques = new List<TechniqueNode>();
+			while (PeekType() == TokenType.Technique)
+				techniques.Add(ParseTechnique());
+
 			return new TechniqueBlockNode
 			{
-				Techniques = new List<TechniqueNode>()
+				Techniques = techniques
+			};
+		}
+
+		private TechniqueNode ParseTechnique()
+		{
+			Eat(TokenType.Technique);
+
+			IdentifierToken techniqueIdentifier = (IdentifierToken) Eat(TokenType.Identifier);
+
+			Eat(TokenType.OpenCurly);
+
+			List<TechniquePassNode> passes = new List<TechniquePassNode>();
+			while (PeekType() == TokenType.Pass)
+				passes.Add(ParseTechniquePass());
+
+			Eat(TokenType.CloseCurly);
+
+			return new TechniqueNode
+			{
+				Name = techniqueIdentifier.Identifier,
+				Passes = passes
+			};
+		}
+
+		private TechniquePassNode ParseTechniquePass()
+		{
+			Eat(TokenType.Pass);
+
+			IdentifierToken passIdentifier = (IdentifierToken)Eat(TokenType.Identifier);
+
+			Eat(TokenType.OpenCurly);
+
+			IdentifierToken fragmentsIdentifier = (IdentifierToken) Eat(TokenType.Identifier);
+			if (fragmentsIdentifier.Identifier != "fragments")
+			{
+				ReportError(Resources.ParserTokenExpected, "fragments");
+				throw new NotSupportedException();
+			}
+
+			Eat(TokenType.Equal);
+
+			Eat(TokenType.OpenSquare);
+			List<Token> fragments = new List<Token>();
+			while (PeekType() != TokenType.CloseSquare)
+			{
+				switch (PeekType())
+				{
+					case TokenType.Identifier:
+						IdentifierToken fragmentIdentifier = (IdentifierToken) Eat(TokenType.Identifier);
+						fragments.Add(fragmentIdentifier);
+						break;
+					case TokenType.Literal :
+						LiteralToken fragmentString = (LiteralToken)Eat(TokenType.Literal);
+						if (fragmentString.LiteralType != LiteralTokenType.String)
+						{
+							ReportError(Resources.ParserTokenUnexpected, fragmentString.ToString());
+							throw new NotSupportedException();
+						}
+						fragments.Add(fragmentString);
+						break;
+					default :
+						ReportError(Resources.StitchedEffectParserStringLiteralOrIdentifierExpected);
+						throw new NotSupportedException();
+				}
+
+				if (PeekType() != TokenType.CloseSquare)
+					Eat(TokenType.Comma);
+			}
+
+			Eat(TokenType.CloseSquare);
+			Eat(TokenType.Semicolon);
+			Eat(TokenType.CloseCurly);
+
+			return new TechniquePassNode
+			{
+				Name = passIdentifier.Identifier,
+				Fragments = fragments
 			};
 		}
 

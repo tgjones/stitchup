@@ -149,5 +149,14 @@ namespace StitchUp.Content.Pipeline.Properties {
                 return ResourceManager.GetString("StitchedEffectParserParameterBlockTypeExpected", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to String literal or identifier expected..
+        /// </summary>
+        internal static string StitchedEffectParserStringLiteralOrIdentifierExpected {
+            get {
+                return ResourceManager.GetString("StitchedEffectParserStringLiteralOrIdentifierExpected", resourceCulture);
+            }
+        }
     }
 }

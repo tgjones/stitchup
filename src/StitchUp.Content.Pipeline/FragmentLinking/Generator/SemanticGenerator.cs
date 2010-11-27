@@ -1,6 +1,6 @@
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
 
-namespace StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration
+namespace StitchUp.Content.Pipeline.FragmentLinking.Generator
 {
 	public class SemanticGenerator
 	{

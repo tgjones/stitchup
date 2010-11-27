@@ -1,43 +1,44 @@
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
 using StitchUp.Content.Pipeline.FragmentLinking.EffectModel;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.PreProcessor
 {
-	public class StitchedEffectPreProcessor
+	public static class StitchedEffectPreProcessor
 	{
-		public void PreProcess(StitchedEffectSymbol stitchedEffect)
+		public static List<ExportedValue> GetExportedValues(StitchedEffectSymbol stitchedEffect)
 		{
-			// Replace all calls to export(...) and import(...)
-			// with expanded versions.
-			Dictionary<string, List<string>> exports = new Dictionary<string, List<string>>();
+			ExportDictionary exports = new ExportDictionary();
+			List<ExportedValue> exportedValues = new List<ExportedValue>();
 			foreach (StitchedFragmentSymbol stitchedFragment in stitchedEffect.StitchedFragments)
 			{
 				foreach (ShaderCodeBlockNode codeBlock in stitchedFragment.FragmentNode.VertexShaders)
-					PreProcessCodeBlock(stitchedFragment.UniqueName, codeBlock, exports);
+					PreProcessCodeBlock(stitchedFragment.UniqueName, codeBlock, exports, exportedValues, true);
 				foreach (ShaderCodeBlockNode codeBlock in stitchedFragment.FragmentNode.PixelShaders)
-					PreProcessCodeBlock(stitchedFragment.UniqueName, codeBlock, exports);
+					PreProcessCodeBlock(stitchedFragment.UniqueName, codeBlock, exports, exportedValues, true);
 			}
+			return exportedValues;
 		}
 
-		private static void PreProcessCodeBlock(string uniqueFragmentName, ShaderCodeBlockNode codeBlock, Dictionary<string, List<string>> exports)
+		public static string PreProcessCodeBlock(string uniqueFragmentName, ShaderCodeBlockNode codeBlock, Dictionary<string, List<string>> exports, List<ExportedValue> exportedValues = null, bool onlyExports = false)
 		{
 			string processedCode = codeBlock.Code;
 
-			// Check program for imports.
-			processedCode = ProcessImports(processedCode, exports);
+			if (!onlyExports)
+			{
+				// Check program for imports.
+				processedCode = ProcessImports(processedCode, exports);
+			}
 
 			// Check program for exports.
-			processedCode = ProcessExports(processedCode, exports, uniqueFragmentName);
+			processedCode = ProcessExports(processedCode, exports, uniqueFragmentName, exportedValues);
 
-			codeBlock.Code = processedCode;
+			return processedCode;
 		}
 
-		private static string ProcessExports(string processedCode, Dictionary<string, List<string>> exports, string uniqueFragmentName)
+		private static string ProcessExports(string processedCode, Dictionary<string, List<string>> exports, string uniqueFragmentName, List<ExportedValue> exportedValues)
 		{
 			const string exportPattern = @"(?<WHITESPACE>[ \t]+)(?<EXPORT>export\((?<TYPE>[\w]+), (?<NAME>[\w]+), (?<VALUE>[\s\S]+?)\);)";
 			MatchCollection exportMatches = Regex.Matches(processedCode, exportPattern);
@@ -53,9 +54,12 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.PreProcessor
 				string variableName = string.Format("{0}_export_{1}", uniqueFragmentName, exportName);
 				if (!exports[exportName].Contains(variableName))
 				{
-					processedCode = string.Format("static {0} {1}; // exported value", match.Groups["TYPE"].Value, variableName)
-						+ Environment.NewLine
-							+ processedCode;
+					if (exportedValues != null)
+						exportedValues.Add(new ExportedValue
+						{
+							Type = match.Groups["TYPE"].Value,
+							Name = variableName
+						});
 					exports[exportName].Add(variableName);
 				}
 			}

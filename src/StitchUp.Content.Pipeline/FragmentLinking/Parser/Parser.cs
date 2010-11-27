@@ -241,7 +241,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			return _tokens[TokenIndex++];
 		}
 
-		private TokenType PeekType(int index = 0)
+		protected TokenType PeekType(int index = 0)
 		{
 			return PeekToken(index).Type;
 		}

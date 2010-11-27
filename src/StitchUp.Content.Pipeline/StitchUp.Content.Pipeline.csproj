@@ -51,7 +51,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FragmentLinking\CodeGeneration\SemanticGenerator.cs" />
+    <Compile Include="FragmentLinking\Generator\ExportedValueGenerator.cs" />
+    <Compile Include="FragmentLinking\Generator\GeneratorContext.cs" />
+    <Compile Include="FragmentLinking\Generator\HeaderCodeGenerator.cs" />
+    <Compile Include="FragmentLinking\Generator\ParameterGenerator.cs" />
+    <Compile Include="FragmentLinking\Generator\SamplerGenerator.cs" />
+    <Compile Include="FragmentLinking\Generator\ScriptTextWriter.cs" />
+    <Compile Include="FragmentLinking\Generator\SemanticGenerator.cs" />
     <Compile Include="FragmentLinking\CodeModel\TechniqueBlockNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\FragmentBlockNode.cs" />
     <Compile Include="FragmentLinking\Compiler\StitchedEffectBuilder.cs" />
@@ -80,6 +86,9 @@
     <Compile Include="FragmentLinking\EffectModel\StitchedFragmentSymbol.cs" />
     <Compile Include="FragmentLinking\CodeModel\TechniquePassNode.cs" />
     <Compile Include="FragmentLinking\CodeModel\VariableDeclarationNode.cs" />
+    <Compile Include="FragmentLinking\Generator\ShaderGenerator.cs" />
+    <Compile Include="FragmentLinking\Generator\StructGenerator.cs" />
+    <Compile Include="FragmentLinking\Generator\TechniqueGenerator.cs" />
     <Compile Include="FragmentLinking\Parser\StitchedEffectParser.cs" />
     <Compile Include="FragmentLinking\Parser\Keywords.cs" />
     <Compile Include="FragmentLinking\CodeModel\StringToken.cs" />
@@ -92,6 +101,8 @@
     <Compile Include="FragmentLinking\Parser\FragmentParser.cs" />
     <Compile Include="FragmentLinking\Parser\Parser.cs" />
     <Compile Include="FragmentLinking\Parser\TextBuffer.cs" />
+    <Compile Include="FragmentLinking\PreProcessor\ExportDictionary.cs" />
+    <Compile Include="FragmentLinking\PreProcessor\ExportedValue.cs" />
     <Compile Include="FragmentLinking\PreProcessor\StitchedEffectPreProcessor.cs" />
     <Compile Include="Graphics\StitchedEffectContent.cs" />
     <Compile Include="ParsingImporter.cs" />
@@ -103,8 +114,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="StitchedEffectImporter.cs" />
-    <Compile Include="FragmentLinking\CodeGeneration\EffectCodeGenerator.cs" />
-    <Compile Include="FragmentLinking\CodeGeneration\StringBuilderExtensionMethods.cs" />
+    <Compile Include="FragmentLinking\Generator\EffectCodeGenerator.cs" />
     <Compile Include="Graphics\FragmentContent.cs" />
     <Compile Include="FragmentLinking\Parser\ParserException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

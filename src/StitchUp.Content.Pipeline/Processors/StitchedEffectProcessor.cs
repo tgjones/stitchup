@@ -1,15 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using StitchUp.Content.Pipeline.FragmentLinking.CodeGeneration;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
 using StitchUp.Content.Pipeline.FragmentLinking.Compiler;
 using StitchUp.Content.Pipeline.FragmentLinking.EffectModel;
+using StitchUp.Content.Pipeline.FragmentLinking.Generator;
 using StitchUp.Content.Pipeline.FragmentLinking.PreProcessor;
 using StitchUp.Content.Pipeline.Graphics;
 
@@ -21,10 +19,6 @@ namespace StitchUp.Content.Pipeline.Processors
 		public override CompiledEffectContent Process(StitchedEffectContent input, ContentProcessorContext context)
 		{
 			StitchedEffectSymbol stitchedEffect = StitchedEffectBuilder.BuildStitchedEffect(input, context);
-
-			// Pre-process stitched effect - this replaces the export / import calls with their expansions.
-			StitchedEffectPreProcessor preProcessor = new StitchedEffectPreProcessor();
-			preProcessor.PreProcess(stitchedEffect);
 
 			// Find out which shader profile to attempt to compile for first.
             ShaderProfile minimumShaderProfile = GetMinimumTargetShaderProfile(stitchedEffect);
@@ -50,8 +44,10 @@ namespace StitchUp.Content.Pipeline.Processors
             out CompiledEffectContent compiledEffect)
         {
             // Generate effect code.
-            EffectCodeGenerator codeGenerator = new EffectCodeGenerator(stitchedEffect, shaderProfile);
-            string effectCode = codeGenerator.GenerateCode();
+        	StringWriter writer = new StringWriter();
+			EffectCodeGenerator codeGenerator = new EffectCodeGenerator(stitchedEffect, shaderProfile, writer);
+            codeGenerator.GenerateCode();
+        	string effectCode = writer.ToString();
 
             // Save effect code so that if there are errors, we'll be able to view the generated .fx file.
             string tempEffectFile = GetTempEffectFileName(input);

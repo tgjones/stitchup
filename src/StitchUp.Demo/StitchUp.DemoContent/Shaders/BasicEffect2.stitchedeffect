@@ -1,0 +1,18 @@
+﻿stitchedeffect basic_effect2;
+
+[techniques]
+technique t1
+{
+	pass p1
+	{
+		fragments =
+		[
+			"Fragments\VertexTypes\PositionNormalTexture.fragment",
+			"Fragments\VertexTypes\VertexPassThru.fragment",
+			"Fragments\BasicMaterial.fragment",
+			"Fragments\Lights\DirectionalLight.fragment",
+			"Fragments\LightingModels\Phong.fragment",
+			"Fragments\PixelColorOutput.fragment"
+		];
+	}
+}

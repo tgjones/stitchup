@@ -3,4 +3,8 @@ Content\ShipDiffuse.xnb
 Content\gameFont.xnb
 Content\Ground.xnb
 Content\Ship.xnb
+Content\Shaders\BasicEffect4.xnb
+Content\Shaders\BasicEffect2.xnb
+Content\Shaders\BasicEffect3.xnb
+Content\Shaders\Fragments\PixelColorOutputTest.xnb
 Content\Shaders\BasicEffect_0.xnb

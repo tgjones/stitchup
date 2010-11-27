@@ -1,7 +1,6 @@
-﻿stitchedeffect basic_effect;
+﻿stitchedeffect basic_effect3;
 
 [fragments]
-fragment pnt = "Fragments\VertexTypes\PositionNormalTexture.fragment";
 fragment vpt = "Fragments\VertexTypes\VertexPassThru.fragment";
 fragment bm = "Fragments\BasicMaterial.fragment";
 fragment dl = "Fragments\Lights\DirectionalLight.fragment";
@@ -13,14 +12,6 @@ technique t1
 {
 	pass p1
 	{
-		fragments = [pnt, vpt, bm, dl, ph, pco];
-	}
-}
-
-technique t2
-{
-	pass p1
-	{
-		fragments = [pnt, vpt, bm, dl, ph, "Fragments\PixelColorOutputTest.fragment"];
+		fragments = ["Fragments\VertexTypes\PositionNormalTexture.fragment", vpt, bm, dl, ph, pco];
 	}
 }

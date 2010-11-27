@@ -8,21 +8,10 @@ float4 ambient_light_diffuse_color : AMBIENT_LIGHT_DIFFUSE_COLOR;
 [interpolators]
 float3 world_position;
 
-[vs]
+[headercode]
 __hlsl__
-void main(INPUT input, inout OUTPUT output)
-{
-	float3 input_pos;
-	import(input_position, input_pos = input_position);
-	
-	output(world_position, mul(float4(input_pos, 1), world));
-}
-__hlsl__
-
-[ps]
-__hlsl__
-
-float4 process_light(light light, float3 cameraPosition,
+float4 process_light(
+	light light, float3 cameraPosition,
 	float3 worldPosition, float3 worldNormal,
 	float4 materialDiffuseColour, float4 materialSpecularColour,
 	float materialSpecularIntensity, float materialSpecularPower)
@@ -44,12 +33,26 @@ float4 process_light(light light, float3 cameraPosition,
 	// on the angle between the light vector and the view vector. Specular lighting
 	// is responsible for creating the highlights that make an object look shiny.
 	float4 specular = saturate(light.diffuse_color * materialSpecularColour * materialSpecularIntensity *
-														 pow(saturate(dot(reflectionVector, directionToCamera)),
-																 materialSpecularPower));
+							   pow(saturate(dot(reflectionVector, directionToCamera)),
+								   materialSpecularPower));
 	
 	return diffuse + specular;
 }
+__hlsl__
 
+[vs]
+__hlsl__
+void main(INPUT input, inout OUTPUT output)
+{
+	float3 input_pos;
+	import(input_position, input_pos = input_position);
+	
+	output(world_position, mul(float4(input_pos, 1), world));
+}
+__hlsl__
+
+[ps]
+__hlsl__
 void main(INPUT input, inout OUTPUT output)
 {
 	// Import world normal - this will have either been exported by a simple pass-through
@@ -81,5 +84,4 @@ void main(INPUT input, inout OUTPUT output)
 
 	export(float4, light_color, final_color);
 }
-
 __hlsl__
