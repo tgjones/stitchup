@@ -4,7 +4,7 @@
 fragment pnt = "Fragments\VertexTypes\PositionNormalTexture.fragment";
 fragment vpt = "Fragments\VertexTypes\VertexPassThru.fragment";
 fragment bm = "Fragments\BasicMaterial.fragment";
-fragment dl = "Fragments\Lights\DirectionalLight.fragment";
+fragment dl = "library:Fragments.Lights.DirectionalLight";
 fragment ph = "Fragments\LightingModels\Phong.fragment";
 fragment pco = "Fragments\PixelColorOutput.fragment";
 

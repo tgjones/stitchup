@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
 using StitchUp.Content.Pipeline.FragmentLinking.EffectModel;
+using StitchUp.Content.Pipeline.FragmentLinking.Parser;
 using StitchUp.Content.Pipeline.Graphics;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.Compiler
@@ -16,7 +17,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Compiler
 			if (stitchedEffectContent.StitchedEffectNode.Fragments == null)
 				stitchedEffectContent.StitchedEffectNode.Fragments = new FragmentBlockNode
 				{
-					FragmentDeclarations = new Dictionary<string, ExternalReference<FragmentContent>>()
+					FragmentDeclarations = new Dictionary<string, FragmentSource>()
 				};
 
 			// If fragments inside technique passes were declared with literal strings, replace them
@@ -33,7 +34,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Compiler
 						{
 							string autoName = "_auto_" + autoIndex++;
 							stitchedEffectContent.StitchedEffectNode.Fragments.FragmentDeclarations.Add(
-								autoName, new ExternalReference<FragmentContent>(((StringToken) passNode.Fragments[i]).Value, stitchedEffectContent.Identity));
+								autoName, StitchedEffectParser.GetFragmentSource(((StringToken) passNode.Fragments[i]).Value, stitchedEffectContent.Identity));
 
 							passNode.Fragments[i] = new IdentifierToken(autoName,
 								passNode.Fragments[i].SourcePath,
@@ -47,7 +48,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Compiler
 
 			// Load fragments.
 			Dictionary<string, FragmentContent> fragmentDictionary = stitchedEffectContent.StitchedEffectNode.Fragments.FragmentDeclarations.ToDictionary(fd => fd.Key,
-				fd => context.BuildAndLoadAsset<FragmentContent, FragmentContent>(fd.Value, null));
+				fd => fd.Value.LoadFragmentContent(context));
 
 			// Load into intermediate objects which keep track of each fragment's unique name.
 			Dictionary<string, StitchedFragmentSymbol> stitchedFragmentDictionary = fragmentDictionary

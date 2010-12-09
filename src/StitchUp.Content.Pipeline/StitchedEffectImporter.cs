@@ -35,7 +35,7 @@ namespace StitchUp.Content.Pipeline
 						Fragments = new FragmentBlockNode
 						{
 							FragmentDeclarations = fragmentDeclarations.ToDictionary(kvp => kvp.Key,
-								kvp => new ExternalReference<FragmentContent>(kvp.Value, identity))
+								kvp => StitchedEffectParser.GetFragmentSource(kvp.Value, identity))
 						},
 						Techniques = new TechniqueBlockNode
 						{

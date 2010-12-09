@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
 using StitchUp.Content.Pipeline.Properties;
 

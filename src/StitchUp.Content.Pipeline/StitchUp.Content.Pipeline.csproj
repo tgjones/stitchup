@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FragmentLinking\CodeModel\FragmentSource.cs" />
     <Compile Include="FragmentLinking\Generator\ExportedValueGenerator.cs" />
     <Compile Include="FragmentLinking\Generator\GeneratorContext.cs" />
     <Compile Include="FragmentLinking\Generator\HeaderCodeGenerator.cs" />
@@ -126,7 +127,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Library\Fragments\Lights\DirectionalLight.fragment" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.ContentPipelineExtensions.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

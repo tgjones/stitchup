@@ -10,7 +10,7 @@ technique t1
 			"Fragments\VertexTypes\PositionNormalTexture.fragment",
 			"Fragments\VertexTypes\VertexPassThru.fragment",
 			"Fragments\BasicMaterial.fragment",
-			"Fragments\Lights\DirectionalLight.fragment",
+			"library:Fragments.Lights.DirectionalLight",
 			"Fragments\LightingModels\Phong.fragment",
 			"Fragments\PixelColorOutput.fragment"
 		];

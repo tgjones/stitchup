@@ -116,12 +116,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Fragments\Lights\DirectionalLight.fragment">
-      <Name>DirectionalLight</Name>
-      <Importer>StitchedEffectImporter</Importer>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Shaders\Fragments\LightingModels\Phong.fragment">
       <Name>Phong</Name>
       <Importer>StitchedEffectImporter</Importer>

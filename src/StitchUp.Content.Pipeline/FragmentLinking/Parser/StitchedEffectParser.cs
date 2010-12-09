@@ -1,21 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
-using StitchUp.Content.Pipeline.Graphics;
 using StitchUp.Content.Pipeline.Properties;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 {
 	public class StitchedEffectParser : Parser
 	{
-		private readonly ContentIdentity _stitchedFragmentContentIdentity;
+		private readonly ContentIdentity _identity;
 
-		public StitchedEffectParser(string path, Token[] tokens, ContentIdentity stitchedFragmentContentIdentity)
+		public StitchedEffectParser(string path, Token[] tokens, ContentIdentity identity)
 			: base(path, tokens)
 		{
-			_stitchedFragmentContentIdentity = stitchedFragmentContentIdentity;
+			_identity = identity;
 		}
 
 		public StitchedEffectNode Parse()
@@ -149,11 +150,16 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			Eat(TokenType.CloseSquare);
 
 			List<VariableDeclarationNode> variableDeclarations = ParseVariableDeclarations(true, true, false, false, TokenType.Fragment);
+			Dictionary<string, FragmentSource> fragmentDeclarations = new Dictionary<string, FragmentSource>();
+			foreach (VariableDeclarationNode variableDeclaration in variableDeclarations)
+			{
+				string path = variableDeclaration.InitialValue.Trim('"');
+				fragmentDeclarations.Add(variableDeclaration.Name, GetFragmentSource(path, _identity));
+			}
+			
 			return new FragmentBlockNode
 			{
-				FragmentDeclarations = variableDeclarations.ToDictionary(
-					vd => vd.Name,
-					vd => new ExternalReference<FragmentContent>(vd.InitialValue.Trim('"'), _stitchedFragmentContentIdentity))
+				FragmentDeclarations = fragmentDeclarations
 			};
 		}
 
@@ -161,6 +167,17 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 		{
 			ReportError(Resources.StitchedEffectParserParameterBlockTypeExpected, blockName.Identifier);
 			throw new NotSupportedException();
+		}
+
+		internal static FragmentSource GetFragmentSource(string path, ContentIdentity identity)
+		{
+			const string prefix = "library:";
+			if (path.StartsWith(prefix))
+			{
+				string resourceName = path.Substring(prefix.Length);
+				return new EmbeddedFragmentSource("Library." + resourceName + ".fragment");
+			}
+			return new FileFragmentSource(path, identity);
 		}
 	}
 }
