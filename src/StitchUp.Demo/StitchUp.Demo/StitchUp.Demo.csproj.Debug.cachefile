@@ -7,4 +7,5 @@ Content\Shaders\BasicEffect4.xnb
 Content\Shaders\BasicEffect2.xnb
 Content\Shaders\BasicEffect3.xnb
 Content\Shaders\Fragments\PixelColorOutputTest.xnb
+Content\Shaders\Fragments\Lights\DirectionalLight.xnb
 Content\Shaders\BasicEffect_0.xnb

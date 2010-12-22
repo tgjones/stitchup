@@ -110,6 +110,10 @@
       <Name>PixelColorOutputTest</Name>
       <Importer>FragmentImporter</Importer>
     </Compile>
+    <Compile Include="Shaders\Fragments\Lights\DirectionalLight.fragment">
+      <Name>DirectionalLight</Name>
+      <Importer>FragmentImporter</Importer>
+    </Compile>
     <None Include="Shaders\Fragments\VertexTypes\PositionNormalTexture.fragment">
       <Name>PositionNormalTexture</Name>
       <Importer>StitchedEffectImporter</Importer>

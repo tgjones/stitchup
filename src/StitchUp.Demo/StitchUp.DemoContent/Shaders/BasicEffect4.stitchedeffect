@@ -1,6 +1,6 @@
 ﻿Fragments\VertexTypes\PositionNormalTexture.fragment
 Fragments\VertexTypes\VertexPassThru.fragment
 Fragments\BasicMaterial.fragment
-library:Fragments.Lights.DirectionalLight
+Fragments\Lights\DirectionalLight.fragment
 Fragments\LightingModels\Phong.fragment
 Fragments\PixelColorOutput.fragment
