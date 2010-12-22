@@ -150,6 +150,9 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
         [Description("TextureCube")]
         TextureCube,
 
+		[Description("sampler")]
+		Sampler,
+
         [Description("true")] // Everything before this and before "effect" is a data type
 		True,
 

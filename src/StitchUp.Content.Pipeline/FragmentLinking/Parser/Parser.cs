@@ -208,8 +208,19 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					ReportError(Resources.ParserInitialValueUnexpected);
 
 				Eat(TokenType.Equal);
-				while (PeekType() != TokenType.Semicolon)
-					initialValue += NextToken().ToString();
+				{
+					bool isSamplerState = (PeekType() == TokenType.Identifier
+						&& ((IdentifierToken) PeekToken()).Identifier == "sampler_state");
+					if (isSamplerState)
+					{
+						while (PeekType() != TokenType.CloseCurly)
+							initialValue += NextToken().ToString();
+						initialValue += NextToken().ToString();
+					}
+					else
+						while (PeekType() != TokenType.Semicolon)
+							initialValue += NextToken().ToString();
+				}
 			}
 
 			Eat(TokenType.Semicolon);

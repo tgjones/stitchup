@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
 using StitchUp.Content.Pipeline.FragmentLinking.EffectModel;
 using StitchUp.Content.Pipeline.FragmentLinking.PreProcessor;
@@ -65,7 +66,17 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Generator
 		{
 			string arrayStuff = (variable.IsArray && variable.ArraySize != null) ? "[" + variable.ArraySize + "]" : string.Empty;
 			string semantic = (!string.IsNullOrEmpty(variable.Semantic)) ? " : " + variable.Semantic : string.Empty;
-			string initialValue = (!string.IsNullOrEmpty(variable.InitialValue)) ? " = " + variable.InitialValue : string.Empty;
+
+			string initialValue;
+			if (!string.IsNullOrEmpty(variable.InitialValue))
+			{
+				string variableInitialValue = variable.InitialValue;
+				if (variableInitialValue.StartsWith("sampler_state"))
+					variableInitialValue = Regex.Replace(variableInitialValue, @"(Texture=\()([\w]+)(\);)", "$1" + prefix + "$2$3");
+				initialValue = " = " + variableInitialValue;
+			}
+			else
+				initialValue = string.Empty;
 
 			return string.Format("{0} {1}{2}{3}{4}{5};",
 				Token.GetString(variable.DataType), prefix,

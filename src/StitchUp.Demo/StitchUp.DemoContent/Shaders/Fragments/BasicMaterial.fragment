@@ -9,6 +9,13 @@ float specular_intensity : SPECULAR_INTENSITY;
 float roughness : ROUGHNESS;
 bool diffuse_texture_enabled : DIFFUSE_TEXTURE_ENABLED;
 
+Texture2D diffuse_texture2;
+sampler diffuse_texture2_sampler2 = sampler_state
+{
+	Texture = (diffuse_texture2);
+	MipFilter = Linear;
+};
+
 [textures]
 Texture2D diffuse_texture;
 
@@ -26,6 +33,8 @@ void main(INPUT input, inout OUTPUT output)
 	{
 		float4 texture_color = tex2D(diffuse_texture, input.uv);
 		export(float4, material_diffuse_color, texture_color);
+
+		float4 texture_color2 = tex2D(diffuse_texture2_sampler2, input.uv);
 	}
 	else
 	{
