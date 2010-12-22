@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{C9CC4A7E-7D1B-437F-95F1-E6316D3775DB}</ProjectGuid>
+    <ProjectGuid>{A0371B80-B1DD-4B34-A24C-F25C51D2F4E7}</ProjectGuid>
     <ProjectTypeGuids>{6D335F3A-9D43-41b4-9D22-F6F17C4BE596};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StitchUp.Demo</RootNamespace>
-    <AssemblyName>StitchUp.Demo</AssemblyName>
+    <RootNamespace>StitchUp.SurfaceShaders.Demo</RootNamespace>
+    <AssemblyName>StitchUp.SurfaceShaders.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <XnaPlatform>Windows</XnaPlatform>
-    <XnaProfile>Reach</XnaProfile>
-    <XnaCrossPlatformGroupID>d481a78b-415e-47a2-b53d-303cc93460cc</XnaCrossPlatformGroupID>
+    <XnaProfile>HiDef</XnaProfile>
+    <XnaCrossPlatformGroupID>23501cb7-9628-4754-9920-dc6c6b7a64ef</XnaCrossPlatformGroupID>
     <XnaOutputType>Game</XnaOutputType>
     <ApplicationIcon>
     </ApplicationIcon>
@@ -115,10 +115,10 @@
     <Compile Include="Ship.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\StitchUp.DemoContent\StitchUp.DemoContent.contentproj">
-      <Name>StitchUp.DemoContent %28Content%29</Name>
+    <ProjectReference Include="..\StitchUp.SurfaceShaders.DemoContent\StitchUp.SurfaceShaders.DemoContent.contentproj">
+      <Name>StitchUp.SurfaceShaders.DemoContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
-      <Project>{F77C2CD7-D01C-4214-88DE-1C8E8619A73F}</Project>
+      <Project>{0EB9B696-D99F-41B2-95E1-C685B00A2A96}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

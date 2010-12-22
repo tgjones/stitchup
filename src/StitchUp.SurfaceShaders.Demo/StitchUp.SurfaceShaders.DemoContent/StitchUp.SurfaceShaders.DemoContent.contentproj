@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{0EB9B696-D99F-41B2-95E1-C685B00A2A96}</ProjectGuid>
+    <ProjectTypeGuids>{96E2B04D-8817-42c6-938A-82C39BA4D311};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
+    <OutputPath>bin\$(Platform)\$(Configuration)</OutputPath>
+    <ContentRootDirectory>Content</ContentRootDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>StitchUp.SurfaceShaders.DemoContent</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.EffectImporter, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.FBXImporter, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.TextureImporter, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.XImporter, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.AudioImporters, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.VideoImporters, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Checker.bmp">
+      <Name>Checker</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ShipDiffuse.tga">
+      <Name>ShipDiffuse</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="gameFont.spritefont">
+      <Name>gameFont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Ground.x">
+      <Name>Ground</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Ship.fbx">
+      <Name>Ship</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Shaders\Normal-Specular.shader">
+      <Name>Normal-Specular</Name>
+      <Importer>ShaderImporter</Importer>
+      <Processor>ShaderProcessor</Processor>
+    </Compile>
+    <Compile Include="Shaders\StandardEffect.shader">
+      <Name>StandardEffect</Name>
+      <Importer>ShaderImporter</Importer>
+      <Processor>ShaderProcessor</Processor>
+    </Compile>
+    <Compile Include="Fragments\LightingModels\BlinnPhong.fragment">
+      <Name>BlinnPhong</Name>
+    </Compile>
+    <Compile Include="Fragments\LightingModels\Lambert.fragment">
+      <Name>Lambert</Name>
+    </Compile>
+    <Compile Include="Fragments\Lights\DirectionalLight.fragment">
+      <Name>DirectionalLight</Name>
+    </Compile>
+    <Compile Include="Fragments\PixelColorOutput.fragment">
+      <Name>PixelColorOutput</Name>
+    </Compile>
+    <Compile Include="Fragments\VertexTypes\PositionNormalTexture.fragment">
+      <Name>PositionNormalTexture</Name>
+    </Compile>
+    <Compile Include="Fragments\VertexTypes\VertexPassThru.fragment">
+      <Name>VertexPassThru</Name>
+    </Compile>
+    <Compile Include="Fragments\Lights\PointLight.fragment">
+      <Name>PointLight</Name>
+      <Importer>FragmentImporter</Importer>
+    </Compile>
+    <Compile Include="Fragments\Lights\LightCommon.fragment">
+      <Name>LightCommon</Name>
+      <Importer>FragmentImporter</Importer>
+    </Compile>
+    <None Include="Shaders\Normal-Diffuse AutoGenerated.fragment">
+      <Name>Normal-Diffuse AutoGenerated</Name>
+    </None>
+    <Compile Include="Shaders\Normal-Diffuse.shader">
+      <Name>Normal-Diffuse</Name>
+      <Importer>ShaderImporter</Importer>
+      <Processor>ShaderProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\StitchUp.Content.Pipeline\StitchUp.Content.Pipeline.csproj">
+      <Project>{EE25B3C8-6749-41BE-B309-7AB361703A01}</Project>
+      <Name>StitchUp.Content.Pipeline</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\StitchUp.SurfaceShaders.Content.Pipeline\StitchUp.SurfaceShaders.Content.Pipeline.csproj">
+      <Project>{B2A432B6-7C67-4F0F-9510-24F48A63A71D}</Project>
+      <Name>StitchUp.SurfaceShaders.Content.Pipeline</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\StitchUp.SurfaceShaders.Demo.Content.Pipeline\StitchUp.SurfaceShaders.Demo.Content.Pipeline.csproj">
+      <Project>{D7A38D16-574C-4853-8EA5-A98127167176}</Project>
+      <Name>StitchUp.SurfaceShaders.Demo.Content.Pipeline</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
+  <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

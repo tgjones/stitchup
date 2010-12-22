@@ -70,7 +70,7 @@ namespace StitchUp.Content.Pipeline
 			return new StitchedEffectParser(fileName, tokens, identity);
 		}
 
-		protected override StitchedEffectContent CreateContent(StitchedEffectParser parser)
+		protected override StitchedEffectContent CreateContent(StitchedEffectParser parser, ContentIdentity identity)
 		{
 			StitchedEffectNode stitchedEffectNode = parser.Parse();
 			return new StitchedEffectContent

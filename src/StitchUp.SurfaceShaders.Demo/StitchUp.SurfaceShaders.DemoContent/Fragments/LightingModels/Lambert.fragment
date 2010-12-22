@@ -1,0 +1,21 @@
+﻿fragment Lambert;
+
+[headercode]
+__hlsl__
+struct LambertSurfaceOutput
+{
+	float3 Diffuse;
+	float3 Normal;
+	float Alpha;
+};
+
+float4 LightingLambert(LambertSurfaceOutput s, Light l, float attenuation, float3 viewDirection)
+{
+	float diffuse = max(0, dot(s.Normal, l.DirectionToLight));
+	
+	float4 c;
+	c.rgb = s.Diffuse * l.Color.rgb * (diffuse * attenuation * 2);
+	c.a = s.Alpha;
+	return c;
+}
+__hlsl__

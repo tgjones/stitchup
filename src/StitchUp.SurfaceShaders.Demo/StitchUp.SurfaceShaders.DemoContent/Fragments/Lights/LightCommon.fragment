@@ -1,0 +1,10 @@
+﻿fragment LightCommon;
+
+[headercode]
+__hlsl__
+struct Light
+{
+	float3 DirectionToLight;
+	float4 Color;
+};
+__hlsl__

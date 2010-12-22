@@ -21,14 +21,20 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			_tokens = tokens;
 		}
 
-		protected IdentifierToken ParseFileDeclaration(TokenType fileDeclarationType)
+		protected IdentifierToken ParseFileDeclaration(TokenType fileDeclarationType, out Token fileDeclarationToken)
 		{
-			Eat(fileDeclarationType);
+			fileDeclarationToken = Eat(fileDeclarationType);
 
 			IdentifierToken name = (IdentifierToken)Eat(TokenType.Identifier);
 			Eat(TokenType.Semicolon);
 
 			return name;
+		}
+
+		protected IdentifierToken ParseFileDeclaration(TokenType fileDeclarationType)
+		{
+			Token fileDeclarationToken;
+			return ParseFileDeclaration(fileDeclarationType, out fileDeclarationToken);
 		}
 
 		protected List<ParseNode> ParseBlocks()

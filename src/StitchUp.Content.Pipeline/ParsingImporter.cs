@@ -36,7 +36,7 @@ namespace StitchUp.Content.Pipeline
 				TParser parser = GetParser(filename, tokens, identity);
 				parser.Error += (sender, e) => ThrowParserException(e, info);
 
-				content = CreateContent(parser);
+				content = CreateContent(parser, identity);
 			}
 			content.Identity = identity;
 			return content;
@@ -48,7 +48,7 @@ namespace StitchUp.Content.Pipeline
 		}
 
 		protected abstract TParser GetParser(string fileName, Token[] tokens, ContentIdentity identity);
-		protected abstract T CreateContent(TParser parser);
+		protected abstract T CreateContent(TParser parser, ContentIdentity identity);
 
 		private static void ThrowParserException(ErrorEventArgs e, FileInfo info)
 		{

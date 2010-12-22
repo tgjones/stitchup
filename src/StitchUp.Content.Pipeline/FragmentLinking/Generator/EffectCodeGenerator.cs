@@ -58,12 +58,17 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Generator
 
 		internal string GetVariableDeclaration(StitchedFragmentSymbol stitchedFragment, VariableDeclarationNode variable)
 		{
+			return GetVariableDeclaration(variable, stitchedFragment.UniqueName + "_");
+		}
+
+		public static string GetVariableDeclaration(VariableDeclarationNode variable, string prefix = "")
+		{
 			string arrayStuff = (variable.IsArray && variable.ArraySize != null) ? "[" + variable.ArraySize + "]" : string.Empty;
 			string semantic = (!string.IsNullOrEmpty(variable.Semantic)) ? " : " + variable.Semantic : string.Empty;
 			string initialValue = (!string.IsNullOrEmpty(variable.InitialValue)) ? " = " + variable.InitialValue : string.Empty;
 
-            return string.Format("{0} {1}_{2}{3}{4}{5};",
-				Token.GetString(variable.DataType), stitchedFragment.UniqueName,
+			return string.Format("{0} {1}{2}{3}{4}{5};",
+				Token.GetString(variable.DataType), prefix,
 				variable.Name, arrayStuff, semantic, initialValue);
 		}
 

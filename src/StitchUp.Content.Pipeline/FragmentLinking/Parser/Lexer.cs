@@ -8,6 +8,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 {
 	public class Lexer
 	{
+		public const string HlslDelimiter = "__hlsl__";
+
 		public event ErrorEventHandler Error;
 
 		private readonly string _path;
@@ -140,15 +142,14 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					return new IntToken(Convert.ToInt32(_value.ToString()), _path, TakePosition());
 				}
 				default :
-					const string hlslDelimiter = "__hlsl__";
-					if (c == hlslDelimiter[0] && PeekIdentifier(hlslDelimiter, 1))
+					if (c == HlslDelimiter[0] && PeekIdentifier(HlslDelimiter, 1))
 					{
-						EatIdentifier(hlslDelimiter, 1);
+						EatIdentifier(HlslDelimiter, 1);
 
-						string shaderCode = EatWhile(c2 => !IsEof && !PeekIdentifier(hlslDelimiter, 0));
+						string shaderCode = EatWhile(c2 => !IsEof && !PeekIdentifier(HlslDelimiter, 0));
 						ShaderCodeToken codeToken = new ShaderCodeToken(shaderCode.Trim(), _path, TakePosition());
 
-						EatIdentifier(hlslDelimiter, 0);
+						EatIdentifier(HlslDelimiter, 0);
 
 						return codeToken;
 					}

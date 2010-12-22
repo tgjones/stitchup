@@ -104,6 +104,10 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Generator
 					mangledCode = Regex.Replace(mangledCode, @"(\W)(" + t.Name + @")(\W)", "$1" + stitchedFragment.UniqueName + "_$2_sampler$3"));
 
 			mangledCode = mangledCode.Replace("void main(", string.Format("void {0}_{1}_{2}(", uniquePassName, stitchedFragment.UniqueName, functionSuffix));
+
+			// This is just here to support surface shaders. Ideally it would be done somewhere else.
+			mangledCode = Regex.Replace(mangledCode, @"(\b)surface\(", string.Format("$1{0}_{1}_{2}_surface(", uniquePassName, stitchedFragment.UniqueName, functionSuffix));
+
 			mangledCode = mangledCode.Replace("INPUT", string.Format("{0}_{1}_{2}", uniquePassName, stitchedFragment.UniqueName, inputStructName));
 			mangledCode = mangledCode.Replace("OUTPUT", uniquePassName + "_" + outputStructName);
 
