@@ -1,0 +1,32 @@
+﻿fragment GaussianBlur;
+
+// Pixel shader applies a one dimensional gaussian blur filter.
+// This is used twice by the bloom postprocess, first to
+// blur horizontally, and then again to blur vertically.
+
+[headercode]
+__hlsl__
+#define SAMPLE_COUNT 15
+__hlsl__
+
+[params]
+sampler TextureSampler; // register(s0) isn't necessary because the HLSL compiler will assign samplers to registers in the order they are defined.
+float2 SampleOffsets[SAMPLE_COUNT];
+float SampleWeights[SAMPLE_COUNT];
+
+[interpolators]
+float2 uv;
+
+[ps]
+__hlsl__
+void main(INPUT input, inout OUTPUT output)
+{
+    float4 c = 0;
+    
+    // Combine a number of weighted image filter taps.
+    for (int i = 0; i < SAMPLE_COUNT; i++)
+        c += tex2D(TextureSampler, input.uv + SampleOffsets[i]) * SampleWeights[i];
+    
+    output.color = c;
+}
+__hlsl__

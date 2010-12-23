@@ -94,6 +94,11 @@
       <Importer>StitchedEffectImporter</Importer>
       <Processor>StitchedEffectProcessor</Processor>
     </Compile>
+    <Compile Include="Shaders\GaussianBlur.stitchedeffect">
+      <Name>GaussianBlur</Name>
+      <Importer>StitchedEffectImporter</Importer>
+      <Processor>StitchedEffectProcessor</Processor>
+    </Compile>
     <None Include="Shaders\Fragments\BasicMaterial.fragment">
       <Name>BasicMaterial</Name>
       <Importer>StitchedEffectImporter</Importer>
@@ -112,6 +117,10 @@
     </Compile>
     <Compile Include="Shaders\Fragments\Lights\DirectionalLight.fragment">
       <Name>DirectionalLight</Name>
+      <Importer>FragmentImporter</Importer>
+    </Compile>
+    <Compile Include="Shaders\Fragments\PostProcessing\GaussianBlur.fragment">
+      <Name>GaussianBlur</Name>
       <Importer>FragmentImporter</Importer>
     </Compile>
     <None Include="Shaders\Fragments\VertexTypes\PositionNormalTexture.fragment">
