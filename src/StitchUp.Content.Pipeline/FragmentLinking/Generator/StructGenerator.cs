@@ -123,7 +123,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Generator
 			writer.WriteLine("struct {0}_VERTEXOUTPUT", uniquePassName);
 			writer.WriteLine("{");
 			writer.WriteLine("\tfloat4 position : POSITION;");
-			generator.ForEachFragment((g, f) =>
+			pass.ForEachFragment(generator, (g, f, s) =>
 			{
 				if (f.FragmentNode.Interpolators != null && f.FragmentNode.Interpolators.VariableDeclarations.Any())
 					g.Writer.WriteLine("\t{0}_{1}_PIXELINPUT {1};", uniquePassName, f.UniqueName);
