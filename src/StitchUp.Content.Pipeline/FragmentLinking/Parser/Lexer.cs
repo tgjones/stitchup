@@ -1,34 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using StitchUp.Content.Pipeline.FragmentLinking.CodeModel;
 using StitchUp.Content.Pipeline.Properties;
 
 namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 {
-	public class Lexer
+	public class Lexer : LexerBase
 	{
-		public const string HlslDelimiter = "__hlsl__";
-
-		public event ErrorEventHandler Error;
-
-		private readonly string _path;
-		private readonly TextBuffer _buffer;
-		private BufferPosition _position;
-
-		// Temporary variables used while lexing.
-		private readonly StringBuilder _value;
-
-		public bool IsEof
-		{
-			get { return _buffer.IsEof; }
-		}
-
 		public Lexer(string path, string text)
+			: base(path, text)
 		{
-			_path = path;
-			_buffer = new TextBuffer(text);
-			_value = new StringBuilder();
+			
 		}
 
 		public Token[] GetTokens()
@@ -90,7 +72,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 				{
 					string value = EatWhile(c2 => c2 != '"');
 					NextChar(); //Swallow the end of the string constant
-					return new StringToken(value, _path, TakePosition());
+					return new StringToken(value, Path, TakePosition());
 				}
 				case '0':
 				case '1':
@@ -108,8 +90,8 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					// If it contains an underscore, then it's a shader profile identifier (i.e. 2_0)
 					bool containsDot = false;
 					bool containsUnderscore = false;
-					_value.Length = 0;
-					_value.Append(c);
+					Value.Length = 0;
+					Value.Append(c);
 					while (!IsEof && (PeekChar() == '.' || PeekChar() == '_' || char.IsDigit(PeekChar())))
 					{
 						char c2 = NextChar();
@@ -127,7 +109,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 								containsUnderscore = true;
 								break;
 						}
-						_value.Append(c2);
+						Value.Append(c2);
 					}
 					bool floatSuffix = false;
 					if (PeekChar() == 'f')
@@ -136,10 +118,10 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 						NextChar();
 					}
 					if (containsUnderscore)
-						return new IdentifierToken(_value.ToString(), _path, TakePosition());
+						return new IdentifierToken(Value.ToString(), Path, TakePosition());
 					if (containsDot || floatSuffix)
-						return new FloatToken(Convert.ToSingle(_value.ToString()), _path, TakePosition());
-					return new IntToken(Convert.ToInt32(_value.ToString()), _path, TakePosition());
+						return new FloatToken(Convert.ToSingle(Value.ToString()), Path, TakePosition());
+					return new IntToken(Convert.ToInt32(Value.ToString()), Path, TakePosition());
 				}
 				default :
 					if (c == HlslDelimiter[0] && PeekIdentifier(HlslDelimiter, 1))
@@ -147,7 +129,7 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 						EatIdentifier(HlslDelimiter, 1);
 
 						string shaderCode = EatWhile(c2 => !IsEof && !PeekIdentifier(HlslDelimiter, 0));
-						ShaderCodeToken codeToken = new ShaderCodeToken(shaderCode.Trim(), _path, TakePosition());
+						ShaderCodeToken codeToken = new ShaderCodeToken(shaderCode.Trim(), Path, TakePosition());
 
 						EatIdentifier(HlslDelimiter, 0);
 
@@ -157,48 +139,12 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 					{
 						string identifier = c + EatWhile(IsIdentifierChar);
 						if (Keywords.IsKeyword(identifier))
-							return new Token(Keywords.GetKeywordType(identifier), _path, TakePosition());
-						return new IdentifierToken(identifier, _path, TakePosition());
+							return new Token(Keywords.GetKeywordType(identifier), Path, TakePosition());
+						return new IdentifierToken(identifier, Path, TakePosition());
 					}
 					ReportError(Resources.LexerUnexpectedCharacter, c);
 					return ErrorToken();
 			}
-		}
-
-		private bool PeekIdentifier(string identifier, int startIndex)
-		{
-			int index = 0;
-			for (int i = startIndex; i < identifier.Length; ++i)
-				if (PeekChar(index++) != identifier[i])
-					return false;
-			return true;
-		}
-
-		private void EatIdentifier(string identifier, int startIndex)
-		{
-			for (int i = startIndex; i < identifier.Length; ++i)
-				NextChar();
-		}
-
-		private static bool IsIdentifierChar(char c)
-		{
-			if (!char.IsLetterOrDigit(c))
-				return (c == '_');
-			return true;
-		}
-
-		private string EatWhile(Func<char, bool> test)
-		{
-			_value.Length = 0;
-			while (!IsEof && test(PeekChar()))
-				_value.Append(NextChar());
-			return _value.ToString();
-		}
-
-		private void ReportError(string message, params object[] args)
-		{
-			if (Error != null)
-				Error(this, new ErrorEventArgs(string.Format(message, args), _buffer.Position));
 		}
 
 		private Token ErrorToken()
@@ -206,60 +152,9 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.Parser
 			return NewToken(TokenType.Error);
 		}
 
-		public static bool IsLineSeparator(char ch)
-		{
-			switch (ch)
-			{
-				case '\u2028':
-				case '\u2029':
-				case '\n':
-				case '\r':
-					return true;
-			}
-			return false;
-		}
-
-		private static bool IsWhiteSpace(char c)
-		{
-			return char.IsWhiteSpace(c);
-		}
-
-		private void EatWhiteSpace()
-		{
-			while (IsWhiteSpace(PeekChar()))
-				NextChar();
-		}
-
-		private char NextChar()
-		{
-			return _buffer.NextChar();
-		}
-
-		private char PeekChar(int index = 0)
-		{
-			return _buffer.PeekChar(index);
-		}
-
-		private void StartToken()
-		{
-			_position = _buffer.Position;
-		}
-
 		private Token NewToken(TokenType type)
 		{
-			return new Token(type, _path, TakePosition());
-		}
-
-		private BufferPosition TakePosition()
-		{
-			BufferPosition position = _position;
-			ClearPosition();
-			return position;
-		}
-
-		private void ClearPosition()
-		{
-			_position = new BufferPosition();
+			return new Token(type, Path, TakePosition());
 		}
 	}
 }

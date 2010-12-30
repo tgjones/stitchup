@@ -90,6 +90,7 @@
     <Compile Include="FragmentLinking\Generator\ShaderGenerator.cs" />
     <Compile Include="FragmentLinking\Generator\StructGenerator.cs" />
     <Compile Include="FragmentLinking\Generator\TechniqueGenerator.cs" />
+    <Compile Include="FragmentLinking\Parser\LexerBase.cs" />
     <Compile Include="FragmentLinking\Parser\StitchedEffectParser.cs" />
     <Compile Include="FragmentLinking\Parser\Keywords.cs" />
     <Compile Include="FragmentLinking\CodeModel\StringToken.cs" />
