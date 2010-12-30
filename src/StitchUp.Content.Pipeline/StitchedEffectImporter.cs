@@ -21,7 +21,7 @@ namespace StitchUp.Content.Pipeline
 		{
 			if (!text.StartsWith("stitchedeffect"))
 			{
-				string[] fragments = text.Split(new [] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+				string[] fragments = text.Split(new[] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
 				Dictionary<string, string> fragmentDeclarations = fragments
 					.Select((f, i) => new KeyValuePair<string, string>("auto_" + i, f))
