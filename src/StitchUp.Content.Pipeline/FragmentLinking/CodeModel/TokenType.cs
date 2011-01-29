@@ -153,6 +153,18 @@ namespace StitchUp.Content.Pipeline.FragmentLinking.CodeModel
 		[Description("sampler")]
 		Sampler,
 
+		[Description("sampler1D")]
+		Sampler1D,
+
+		[Description("sampler2D")]
+		Sampler2D,
+
+		[Description("sampler3D")]
+		Sampler3D,
+
+		[Description("samplerCUBE")]
+		SamplerCube,
+
         [Description("true")] // Everything before this and before "effect" is a data type
 		True,
 
